@@ -42,7 +42,7 @@ create type public.trip_status as enum ('SCHEDULED', 'PICKED_UP', 'IN_TRANSIT', 
 create type public.evidence_type as enum ('PICKUP_PHOTO', 'DELIVERY_PHOTO', 'WEIGHT_TICKET', 'SIGNATURE', 'DOCUMENT', 'OTHER');
 create type public.risk_event_status as enum ('DETECTED', 'UNCONFIRMED', 'CONFIRMED', 'ACTIVE', 'RESOLVED', 'DISCARDED', 'STALE');
 create type public.source_type as enum ('OFFICIAL', 'NEWS', 'SOCIAL', 'USER_REPORT', 'MANUAL');
-create type public.analysis_provider as enum ('OPENAI', 'RULE_ENGINE', 'MANUAL');
+create type public.analysis_provider as enum ('GEMINI', 'RULE_ENGINE', 'MANUAL');
 create type public.analysis_status as enum ('QUEUED', 'RUNNING', 'SUCCEEDED', 'FAILED');
 create type public.notification_status as enum ('UNREAD', 'READ', 'ARCHIVED');
 

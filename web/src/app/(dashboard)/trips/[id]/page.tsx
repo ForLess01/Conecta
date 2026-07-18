@@ -10,7 +10,7 @@ import { DesktopTopBar } from "@/components/layout/top-bar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPlaceholder } from "@/components/maps/map-placeholder";
+import { TripRouteMap } from "@/components/maps/trip-route-map";
 import { RiskBadge } from "@/components/marketplace/risk-badge";
 import { formatDateTime } from "@/lib/format";
 import { VEHICLE_LABELS } from "@/lib/mock/vehicle-labels";
@@ -41,11 +41,22 @@ export default function TripTrackingPage({ params }: { params: Promise<{ id: str
 
       <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
         <div className="space-y-4">
-          <MapPlaceholder
-            label="Ruta del viaje"
-            markers={trip.stops.map((s) => ({ label: s.label }))}
-            className="min-h-56"
-          />
+          {activeRole === "transportista" && freight ? (
+            <TripRouteMap
+              origin={freight.origin}
+              destination={freight.destination}
+              distanceKm={freight.distanceKm}
+              stops={trip.stops.map((stop) => stop.label)}
+            />
+          ) : freight ? (
+            <Card>
+              <CardContent className="grid gap-4 pt-6 sm:grid-cols-3">
+                <div><p className="text-xs text-muted-foreground">Origen</p><p className="text-sm font-medium">{freight.origin.district}</p></div>
+                <div><p className="text-xs text-muted-foreground">Destino</p><p className="text-sm font-medium">{freight.destination.district}</p></div>
+                <div><p className="text-xs text-muted-foreground">Estado de entrega</p><p className="text-sm font-medium">{STATUS_LABEL[trip.status]}</p></div>
+              </CardContent>
+            </Card>
+          ) : null}
 
           <Card>
             <CardContent className="space-y-4 pt-6">
@@ -92,7 +103,7 @@ export default function TripTrackingPage({ params }: { params: Promise<{ id: str
               <p className="text-xs text-muted-foreground">
                 {vehicle ? `${VEHICLE_LABELS[vehicle.type]} · ${vehicle.plate}` : "—"}
               </p>
-              <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => toast.info("Llamando al conductor (demo).")}>
+              <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => toast.info("Llamando al conductor.")}>
                 <Phone className="size-4" /> Contactar conductor
               </Button>
             </CardContent>
@@ -108,26 +119,20 @@ export default function TripTrackingPage({ params }: { params: Promise<{ id: str
             </Card>
           )}
 
-          <Card>
-            <CardContent className="space-y-2 pt-6">
-              {activeRole === "transportista" && (
-                <Button className="w-full" onClick={() => toast.success("Estado actualizado (demo).")}>
+          {activeRole === "transportista" && (
+            <Card>
+              <CardContent className="space-y-2 pt-6">
+                <Button className="w-full" onClick={() => toast.success("Estado actualizado.")}>
                   Actualizar estado
                 </Button>
-              )}
-              <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" size="sm" asChild>
-                  <Link href={`/trips/${trip.id}/pickup`}>Registrar recojo</Link>
-                </Button>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href={`/trips/${trip.id}/delivery`}>Registrar entrega</Link>
-                </Button>
-              </div>
-              <Button variant="ghost" size="sm" asChild className="w-full">
-                <Link href={`/trips/${trip.id}/incident`}>Reportar incidencia</Link>
-              </Button>
-            </CardContent>
-          </Card>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" size="sm" asChild><Link href={`/trips/${trip.id}/pickup`}>Registrar recojo</Link></Button>
+                  <Button variant="outline" size="sm" asChild><Link href={`/trips/${trip.id}/delivery`}>Registrar entrega</Link></Button>
+                </div>
+                <Button variant="ghost" size="sm" asChild className="w-full"><Link href={`/trips/${trip.id}/incident`}>Reportar incidencia</Link></Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

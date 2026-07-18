@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HelpCircle, Settings } from "lucide-react";
-import { Logo } from "@/components/brand/logo";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { navForRole } from "./nav-items";
 import { useRole } from "./role-context";
 import { RoleSwitcher } from "./role-switcher";
@@ -17,7 +17,7 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex md:w-64 md:flex-col border-r border-border bg-card h-screen sticky top-0">
       <div className="flex items-center gap-2 px-5 py-5">
-        <Logo size={30} />
+        <BrandLogo size={30} />
         <span className="font-heading text-lg font-semibold tracking-tight">Conecta</span>
       </div>
 

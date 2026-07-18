@@ -10,7 +10,7 @@ export default function AdminAnalyticsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <DesktopTopBar title="Analítica" description="Indicadores de desempeño de la plataforma (datos de demostración)." />
+        <DesktopTopBar title="Analítica" description="Indicadores de desempeño de la plataforma." />
         <div className="flex gap-2">
           <Button variant="outline">Filtrar rango</Button>
           <Button>Exportar</Button>

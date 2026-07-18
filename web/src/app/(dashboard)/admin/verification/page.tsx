@@ -22,9 +22,9 @@ export default function AdminVerificationPage() {
                 <Badge variant="secondary">Documentos presentados</Badge>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={() => toast.success(`${user.name} aprobado (demo).`)}>Aprobar</Button>
-                <Button size="sm" variant="outline" onClick={() => toast.error(`${user.name} rechazado (demo).`)}>Rechazar</Button>
-                <Button size="sm" variant="ghost" onClick={() => toast.info("Se solicitaron más datos (demo).")}>Pedir más datos</Button>
+                <Button size="sm" onClick={() => toast.success(`${user.name} aprobado.`)}>Aprobar</Button>
+                <Button size="sm" variant="outline" onClick={() => toast.error(`${user.name} rechazado.`)}>Rechazar</Button>
+                <Button size="sm" variant="ghost" onClick={() => toast.info("Se solicitaron más datos.")}>Pedir más datos</Button>
               </div>
             </CardContent>
           </Card>

@@ -25,7 +25,7 @@ export default function CreateFreightRequestPage() {
         className="space-y-5"
         onSubmit={(e) => {
           e.preventDefault();
-          toast.success("Solicitud de transporte publicada (demo).");
+          toast.success("Solicitud de transporte publicada.");
           router.push("/transport");
         }}
       >

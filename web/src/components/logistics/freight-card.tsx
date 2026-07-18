@@ -1,14 +1,36 @@
 import Link from "next/link";
-import type { FreightRequest } from "@/types/domain";
+import Image from "next/image";
+import type { FreightRequest, VehicleType } from "@/types/domain";
+import { img, type ImageKey } from "@/lib/images";
 import { RiskBadge } from "@/components/marketplace/risk-badge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatSoles, formatDate } from "@/lib/format";
 import { VEHICLE_LABELS } from "@/lib/mock/vehicle-labels";
 
+const VEHICLE_IMAGE: Record<VehicleType, ImageKey> = {
+  pickup: "pickup",
+  camioneta_4x4: "ruralCar",
+  camion_ligero: "truckRoad",
+  camion_8t: "truck8t",
+  camion_12t: "truckCargo",
+  furgon_cubierto: "truckHighway",
+};
+
 export function FreightCard({ freight }: { freight: FreightRequest }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
+    <div className="flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="relative h-28">
+        <Image
+          src={img(VEHICLE_IMAGE[freight.suggestedVehicle], 800)}
+          alt={`Transporte de carga: ${VEHICLE_LABELS[freight.suggestedVehicle]} en ruta`}
+          fill
+          sizes="(max-width: 640px) 100vw, 33vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
+      </div>
+      <div className="flex flex-col gap-3 p-4 pt-0">
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="font-heading text-sm font-semibold">
@@ -38,6 +60,7 @@ export function FreightCard({ freight }: { freight: FreightRequest }) {
             <Link href={`/transport/${freight.id}#ofertar`}>Ofertar</Link>
           </Button>
         </div>
+      </div>
       </div>
     </div>
   );

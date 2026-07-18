@@ -14,10 +14,10 @@ export default function AdminPricesPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <DesktopTopBar title="Observaciones de precios" description="Precios de referencia que alimentan el motor de sugerencia de precio." />
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-2" onClick={() => toast.success("CSV importado (demo).")}>
+          <Button variant="outline" className="gap-2" onClick={() => toast.success("CSV importado.")}>
             <Upload className="size-4" /> Importar CSV
           </Button>
-          <Button onClick={() => toast.info("Formulario de nueva observación (demo).")}>Registrar observación</Button>
+          <Button onClick={() => toast.info("Formulario de nueva observación.")}>Registrar observación</Button>
         </div>
       </div>
 

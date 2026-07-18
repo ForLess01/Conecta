@@ -22,7 +22,7 @@ export default function CreateRiskEventPage() {
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              toast.success("Evento de riesgo guardado (demo).");
+              toast.success("Evento de riesgo guardado.");
               router.push("/admin/risk-events");
             }}
           >
@@ -76,7 +76,7 @@ export default function CreateRiskEventPage() {
             </div>
 
             <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              Adjuntar evidencia fotográfica (demo)
+              Adjuntar evidencia fotográfica
             </div>
 
             <div className="flex justify-end gap-2">

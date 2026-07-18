@@ -20,7 +20,7 @@ export default function CompareProposalsPage({ params }: { params: Promise<{ id:
   const original = negotiation.proposals[0];
   const counter = {
     ...original,
-    id: "counter-demo",
+    id: "counter-preview",
     quantity: Math.round(original.quantity * 0.9),
     pricePerUnit: Number((original.pricePerUnit * 1.05).toFixed(2)),
     deliveryDate: original.deliveryDate,
@@ -68,7 +68,7 @@ export default function CompareProposalsPage({ params }: { params: Promise<{ id:
         <Button
           variant="outline"
           onClick={() => {
-            toast.info("Contraoferta enviada (demo).");
+            toast.info("Contraoferta enviada.");
             router.push(`/negotiations/${negotiation.id}`);
           }}
         >

@@ -15,44 +15,76 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Product } from "@/types/domain";
 import { formatSoles } from "@/lib/format";
-import { evaluateQuickOffer, MAX_QUICK_OFFER_ATTEMPTS } from "@/lib/negotiation/quick-offer";
+import {
+  MAX_QUICK_OFFER_ATTEMPTS,
+  type QuickOfferResponse,
+} from "@/lib/negotiation/quick-offer";
 import { CategoryIcon } from "@/components/brand/category-icons";
 
 export function QuickOfferDialog({
   product,
   open,
   onOpenChange,
-  initialAttempt = 1,
 }: {
   product: Product;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialAttempt?: number;
 }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(product.minOrder);
   const [price, setPrice] = useState(product.priceRange.central);
-  const attempt = initialAttempt;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const subtotal = useMemo(() => quantity * price, [quantity, price]);
-  const attemptsRemaining = MAX_QUICK_OFFER_ATTEMPTS - (attempt - 1);
 
-  function submitOffer() {
-    const result = evaluateQuickOffer({ product, offeredPricePerUnit: price, attemptNumber: attempt });
-    onOpenChange(false);
+  async function submitOffer() {
+    setIsSubmitting(true);
+    setSubmitError(null);
 
-    const params = new URLSearchParams({
-      productId: product.id,
-      price: String(price),
-      quantity: String(quantity),
-    });
+    try {
+      const response = await fetch("/api/negotiations/quick-offer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: product.id,
+          quantity,
+          offeredPricePerUnit: price,
+        }),
+      });
 
-    if (result.accepted) {
-      router.push(`/marketplace/offers/${product.id}/match?${params.toString()}`);
-    } else {
-      router.push(
-        `/marketplace/offers/${product.id}/not-accepted?${params.toString()}&attemptsRemaining=${result.attemptsRemaining}`
+      const payload = (await response.json()) as QuickOfferResponse | { error?: string };
+
+      if (!response.ok || !("accepted" in payload)) {
+        throw new Error("error" in payload && payload.error ? payload.error : "No se pudo procesar la oferta rápida.");
+      }
+
+      onOpenChange(false);
+
+      const params = new URLSearchParams({
+        productId: product.id,
+        price: String(price),
+        quantity: String(quantity),
+        status: payload.status,
+      });
+
+      if (payload.accepted) {
+        if (payload.reservationExpiresAt) {
+          params.set("reservationExpiresAt", payload.reservationExpiresAt);
+        }
+        if (payload.orderId) params.set("orderId", payload.orderId);
+        if (payload.negotiationId) params.set("negotiationId", payload.negotiationId);
+        router.push(`/marketplace/offers/${product.id}/match?${params.toString()}`);
+      } else {
+        params.set("attemptsRemaining", String(payload.attemptsRemaining));
+        router.push(`/marketplace/offers/${product.id}/not-accepted?${params.toString()}`);
+      }
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "No se pudo procesar la oferta rápida."
       );
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -114,16 +146,21 @@ export function QuickOfferDialog({
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Intentos disponibles: {attemptsRemaining} de {MAX_QUICK_OFFER_ATTEMPTS}
+            Máximo de intentos: {MAX_QUICK_OFFER_ATTEMPTS}
           </p>
+          {submitError && (
+            <p role="alert" className="text-sm text-destructive">
+              {submitError}
+            </p>
+          )}
         </div>
 
         <DialogFooter className="flex-row justify-end gap-2">
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
             Cancelar
           </Button>
-          <Button onClick={submitOffer} disabled={attemptsRemaining <= 0}>
-            Enviar oferta rápida
+          <Button onClick={submitOffer} disabled={isSubmitting || quantity <= 0 || price <= 0}>
+            {isSubmitting ? "Enviando…" : "Enviar oferta rápida"}
           </Button>
         </DialogFooter>
       </DialogContent>

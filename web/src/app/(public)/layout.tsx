@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Logo } from "@/components/brand/logo";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { Button } from "@/components/ui/button";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -7,12 +7,18 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
-          <Link href="/" className="flex items-center gap-2">
-            <Logo size={30} />
+          <Link href="/" aria-label="Conecta, ir al inicio" className="flex items-center gap-2">
+            <BrandLogo size={30} />
             <span className="font-heading text-lg font-semibold tracking-tight">Conecta</span>
           </Link>
-          <nav className="flex items-center gap-2">
+          <nav aria-label="Navegación pública" className="flex items-center gap-1 sm:gap-2">
             <Button variant="ghost" asChild className="hidden sm:inline-flex">
+              <Link href="/">Inicio</Link>
+            </Button>
+            <Button variant="ghost" asChild className="hidden md:inline-flex">
+              <Link href="/plans">Planes</Link>
+            </Button>
+            <Button variant="ghost" asChild className="hidden lg:inline-flex">
               <Link href="/marketplace">Explorar marketplace</Link>
             </Button>
             <Button variant="ghost" asChild>

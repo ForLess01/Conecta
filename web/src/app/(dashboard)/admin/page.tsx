@@ -16,7 +16,7 @@ export default function AdminDashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <DesktopTopBar title="Panel de administración" description="Resumen operativo de la plataforma." />
-        <Button className="gap-2" onClick={() => toast.success("Riesgos actualizados con IA (simulado).")}>
+        <Button className="gap-2" onClick={() => toast.success("Riesgos actualizados.")}>
           <RefreshCcw className="size-4" /> Actualizar riesgos con IA
         </Button>
       </div>

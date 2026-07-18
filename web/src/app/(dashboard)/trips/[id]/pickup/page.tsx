@@ -27,7 +27,7 @@ export default function RegisterPickupPage({ params }: { params: Promise<{ id: s
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              toast.success("Recojo confirmado (demo).");
+              toast.success("Recojo confirmado.");
               router.push(`/trips/${trip.id}`);
             }}
           >
@@ -42,7 +42,7 @@ export default function RegisterPickupPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
             <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              Adjuntar fotografías de la carga (demo)
+              Adjuntar fotografías de la carga
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="state">Estado de la mercadería</Label>

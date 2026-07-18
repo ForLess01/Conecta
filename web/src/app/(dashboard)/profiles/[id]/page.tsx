@@ -2,6 +2,7 @@
 
 import { use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { PRODUCERS, BUYERS, TRANSPORTERS } from "@/lib/mock/actors";
 import { PRODUCTS } from "@/lib/mock/products";
@@ -10,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VerificationBadge } from "@/components/marketplace/misc-badges";
 import { VEHICLE_LABELS } from "@/lib/mock/vehicle-labels";
+import { avatarUrl } from "@/lib/avatars";
 
 export default function PublicProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -28,9 +30,19 @@ export default function PublicProfilePage({ params }: { params: Promise<{ id: st
 
       <Card>
         <CardContent className="flex items-center gap-4 pt-6">
-          <div className="flex size-16 items-center justify-center rounded-full bg-secondary text-lg font-semibold text-secondary-foreground">
-            {(producer ?? buyer ?? transporter)?.name.slice(0, 2).toUpperCase()}
-          </div>
+          {avatarUrl(id) ? (
+            <Image
+              src={avatarUrl(id)!}
+              alt={`Fotografía de ${(producer ?? buyer ?? transporter)?.name}`}
+              width={64}
+              height={64}
+              className="size-16 rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex size-16 items-center justify-center rounded-full bg-secondary text-lg font-semibold text-secondary-foreground">
+              {(producer ?? buyer ?? transporter)?.name.slice(0, 2).toUpperCase()}
+            </div>
+          )}
           <div>
             <p className="font-heading text-lg font-semibold">{producer?.name ?? buyer?.name ?? transporter?.name}</p>
             <VerificationBadge level={(producer ?? buyer ?? transporter)!.verification} />

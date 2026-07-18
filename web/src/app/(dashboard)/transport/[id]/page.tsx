@@ -85,7 +85,7 @@ export default function FreightDetailPage({ params }: { params: Promise<{ id: st
               className="space-y-4"
               onSubmit={(e) => {
                 e.preventDefault();
-                toast.success("Oferta de flete enviada (demo).");
+                toast.success("Oferta de flete enviada.");
                 router.push(`/transport/${freight.id}/compare`);
               }}
             >

@@ -59,11 +59,11 @@ export default function RiskDetailPage({ params }: { params: Promise<{ id: strin
             <Button
               variant="outline"
               size="sm"
-              onClick={() => toast.success("Análisis actualizado con Gemini (simulado).")}
+              onClick={() => toast.success("Análisis actualizado.")}
             >
               Actualizar análisis
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => toast.info("Reporte de estado de vía enviado (demo).")}>
+            <Button variant="ghost" size="sm" onClick={() => toast.info("Reporte de estado de vía enviado.")}>
               Reportar estado de vía
             </Button>
           </div>

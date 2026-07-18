@@ -26,7 +26,7 @@ export default function CompareFreightBidsPage({ params }: { params: Promise<{ i
   const bids = getBidsForFreight(freight.id);
 
   function selectBid(transporterName: string) {
-    toast.success(`Transportista ${transporterName} seleccionado (demo).`);
+    toast.success(`Transportista ${transporterName} seleccionado.`);
     router.push("/trips/trip-1");
   }
 

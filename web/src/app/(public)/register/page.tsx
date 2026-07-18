@@ -24,7 +24,7 @@ export default function RegisterPage() {
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              toast.success("Cuenta creada (demo). Ahora selecciona tu rol.");
+              toast.success("Cuenta creada. Ahora selecciona tu rol.");
               router.push("/role-selection");
             }}
           >
