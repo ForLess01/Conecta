@@ -264,7 +264,10 @@ begin
   ) returning * into v_proposal;
 
   update public.negotiations
-  set status = case when p_supersedes_proposal_id is null then 'OFFER_SUBMITTED' else 'COUNTERED' end
+  set status = case
+    when p_supersedes_proposal_id is null then 'OFFER_SUBMITTED'::public.negotiation_status
+    else 'COUNTERED'::public.negotiation_status
+  end
   where id = p_negotiation_id;
 
   insert into public.messages (negotiation_id, sender_actor_id, message_type, body)
