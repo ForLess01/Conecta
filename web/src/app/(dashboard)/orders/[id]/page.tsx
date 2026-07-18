@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FileWarning, Image as ImageIcon } from "lucide-react";
 import { DesktopTopBar } from "@/components/layout/top-bar";
-import { ReservationTimer } from "@/components/negotiation/reservation-timer";
+import { OrderReservationTimer } from "@/components/orders/order-reservation-timer";
 import { OrderTimeline } from "@/components/orders/order-timeline";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,7 +27,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
   return <div className="space-y-6">
     <DesktopTopBar title={`Orden ${order.id}`} description={order.status.replaceAll("_", " ")} />
-    {order.status === "RESERVED" && order.reservationExpiresAt && <Card><CardContent className="pt-6"><ReservationTimer expiresAt={order.reservationExpiresAt} /></CardContent></Card>}
+    {order.status === "RESERVED" && order.reservationExpiresAt && <Card><CardContent className="pt-6"><OrderReservationTimer expiresAt={order.reservationExpiresAt} /></CardContent></Card>}
     <Tabs defaultValue="resumen">
       <TabsList className="flex-wrap"><TabsTrigger value="resumen">Resumen</TabsTrigger><TabsTrigger value="productores">Productores</TabsTrigger><TabsTrigger value="logistica">Logística</TabsTrigger><TabsTrigger value="evidencias">Evidencias</TabsTrigger><TabsTrigger value="incidencias">Incidencias</TabsTrigger><TabsTrigger value="historial">Historial</TabsTrigger></TabsList>
       <TabsContent value="resumen" className="space-y-4"><Card><CardContent className="grid gap-4 pt-6 sm:grid-cols-2">

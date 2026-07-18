@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 function secondsUntil(expiresAt?: string, minutes?: number) {
@@ -9,13 +9,33 @@ function secondsUntil(expiresAt?: string, minutes?: number) {
     : (minutes ?? 0) * 60;
 }
 
-export function ReservationTimer({ minutes, expiresAt, className }: { minutes?: number; expiresAt?: string; className?: string }) {
+export function ReservationTimer({
+  minutes,
+  expiresAt,
+  className,
+  onExpire,
+}: {
+  minutes?: number;
+  expiresAt?: string;
+  className?: string;
+  onExpire?: () => void;
+}) {
   const [secondsLeft, setSecondsLeft] = useState(() => secondsUntil(expiresAt, minutes));
+  const expirationNotified = useRef(false);
+  const notifyExpired = useEffectEvent(() => onExpire?.());
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSecondsLeft(secondsUntil(expiresAt, minutes));
-    }, 1000);
+    expirationNotified.current = false;
+    const tick = () => {
+      const nextSeconds = secondsUntil(expiresAt, minutes);
+      setSecondsLeft(nextSeconds);
+      if (nextSeconds === 0 && !expirationNotified.current) {
+        expirationNotified.current = true;
+        notifyExpired();
+      }
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, [expiresAt, minutes]);
 

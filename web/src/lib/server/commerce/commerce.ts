@@ -31,6 +31,11 @@ async function rpc<Name extends CommerceFunctionName, T>(
 export class CommerceAccessError extends Error {}
 export class CommerceOperationError extends Error {}
 
+async function releaseExpiredReservations(supabase: RpcClient) {
+  const { error } = await supabase.rpc("release_expired_inventory_reservations");
+  if (error) throw new CommerceOperationError(`Could not expire inventory reservations: ${error.message}`);
+}
+
 export async function createConversation(listingId: string) {
   const { supabase, actor } = await context();
   const rows = await rpc<"commerce_create_conversation", Array<{ negotiation_id: string; expires_at: string; reused: boolean }>>(
@@ -111,11 +116,13 @@ export async function getNegotiation(negotiationId: string): Promise<Negotiation
 
 export async function listOrders(): Promise<CommerceOrder[]> {
   const { supabase, actor } = await context();
+  await releaseExpiredReservations(supabase);
   return rpc<"commerce_list_orders", CommerceOrder[]>(supabase, "commerce_list_orders", { p_actor_id: actor.id });
 }
 
 export async function getOrder(orderId: string): Promise<CommerceOrder | null> {
   const { supabase, actor } = await context();
+  await releaseExpiredReservations(supabase);
   return rpc<"commerce_get_order", CommerceOrder | null>(supabase, "commerce_get_order", {
     p_order_id: orderId,
     p_actor_id: actor.id,
