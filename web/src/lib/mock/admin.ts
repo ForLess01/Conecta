@@ -1,0 +1,62 @@
+import type { PriceObservation } from "@/types/domain";
+
+export const PRICE_OBSERVATIONS: PriceObservation[] = [
+  {
+    id: "obs-1",
+    product: "Papa",
+    variety: "Canchán",
+    market: "Mercado Mayorista de Juliaca",
+    region: "Puno",
+    date: "2026-07-16",
+    low: 1.3,
+    central: 1.5,
+    high: 1.75,
+    unit: "kg",
+    quality: "Primera",
+    source: "Reporte MIDAGRI",
+  },
+  {
+    id: "obs-2",
+    product: "Quinua",
+    variety: "Real",
+    market: "Mercado Bellavista - Ilave",
+    region: "Puno",
+    date: "2026-07-15",
+    low: 6.0,
+    central: 6.8,
+    high: 7.5,
+    unit: "kg",
+    quality: "Grano grande",
+    source: "Observación de campo",
+  },
+  {
+    id: "obs-3",
+    product: "Fibra de alpaca",
+    variety: "Huacaya blanca",
+    market: "Centro de acopio Juli",
+    region: "Puno",
+    date: "2026-07-14",
+    low: 18,
+    central: 21,
+    high: 24,
+    unit: "kg",
+    quality: "21-23 micras",
+    source: "Cooperativa textil",
+  },
+];
+
+export const ADMIN_KPIS = {
+  usersByRole: { productor: 412, comprador: 268, transportista: 96 },
+  activeListings: 187,
+  negotiationsInProgress: 34,
+  ordersByStatus: {
+    pendiente_logistica: 12,
+    en_transito: 9,
+    completado: 143,
+    con_incidencia: 3,
+  },
+  activeShipments: 21,
+  activeRiskEvents: 4,
+  priceCoveragePercent: 78,
+  openIncidents: 5,
+};

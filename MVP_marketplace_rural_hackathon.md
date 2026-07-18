@@ -427,11 +427,15 @@ Vigencia: 12 horas
 ## Reglas
 
 - El productor define una ventana inicial: 12, 24, 48 o 72 horas.
-- La conversación puede extenderse una vez.
+- Cada contraoferta reinicia la ventana de vigencia (no solo la extensión única).
 - Solo una propuesta puede estar activa por parte.
-- Aceptar una propuesta crea la orden.
+- Solo puede existir una conversación con tarjeta activa por comprador-publicación a la vez.
+- Aceptar una propuesta crea la orden y bloquea nuevas tarjetas sobre esa conversación.
 - El texto del chat no modifica automáticamente el acuerdo.
 - Solo una tarjeta aceptada constituye el acuerdo registrado.
+- Al vencer sin respuesta, la conversación queda de solo lectura; para retomar se inicia una nueva.
+
+> Estados formales de la conversación: ver `docs/ARQUITECTURA.md`.
 
 ## Flujo
 
@@ -1378,6 +1382,8 @@ SOLD_OUT
 CLOSED
 ```
 
+> Transiciones y reglas de negocio de este estado: ver `docs/ARQUITECTURA.md`.
+
 ## Negociación
 
 ```text
@@ -2170,6 +2176,8 @@ SENTRY_DSN=
 ---
 
 # 33. Datos de demostración sugeridos
+
+> Plan cerrado con usuarios semilla concretos: ver `docs/DEMO_DATA_PLAN.md`.
 
 ## Productores
 
