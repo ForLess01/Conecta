@@ -2,6 +2,7 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Bookmark, Share2, Zap, MessagesSquare, ChevronRight } from "lucide-react";
 import { getProductById, PRODUCTS } from "@/lib/mock/products";
@@ -17,6 +18,7 @@ import { VerificationBadge } from "@/components/marketplace/misc-badges";
 import { MapPlaceholder } from "@/components/maps/map-placeholder";
 import { ProductCard } from "@/components/marketplace/product-card";
 import { QuickOfferDialog } from "@/components/negotiation/quick-offer-dialog";
+import { avatarUrl } from "@/lib/avatars";
 import { formatQuantity } from "@/lib/format";
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -35,8 +37,38 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-6">
-          <div className="flex h-56 items-center justify-center rounded-2xl bg-secondary">
-            <CategoryIcon category={product.category} size={72} className="text-primary" />
+          <div className="space-y-2">
+            <div className="relative h-64 overflow-hidden rounded-2xl bg-secondary md:h-80">
+              {product.photos[0] ? (
+                <Image
+                  src={product.photos[0]}
+                  alt={`${product.name} — ${product.variety}`}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <CategoryIcon category={product.category} size={72} className="text-primary" />
+                </div>
+              )}
+            </div>
+            {product.photos.length > 1 && (
+              <div className="grid grid-cols-3 gap-2">
+                {product.photos.slice(1, 4).map((photo, index) => (
+                  <div key={photo} className="relative h-24 overflow-hidden rounded-xl bg-secondary">
+                    <Image
+                      src={photo}
+                      alt={`${product.name} — fotografía adicional ${index + 2}`}
+                      fill
+                      sizes="20vw"
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <Card>
@@ -112,9 +144,19 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             <CardContent className="space-y-3 pt-6">
               <p className="text-xs font-medium text-muted-foreground">Productor</p>
               <div className="flex items-center gap-3">
-                <div className="flex size-11 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-secondary-foreground">
-                  {producer?.name.slice(0, 2).toUpperCase()}
-                </div>
+                {producer && avatarUrl(producer.id) ? (
+                  <Image
+                    src={avatarUrl(producer.id)!}
+                    alt={`Fotografía de ${producer.name}`}
+                    width={44}
+                    height={44}
+                    className="size-11 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex size-11 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-secondary-foreground">
+                    {producer?.name.slice(0, 2).toUpperCase()}
+                  </div>
+                )}
                 <div>
                   <p className="text-sm font-medium">{producer?.name}</p>
                   {producer && <VerificationBadge level={producer.verification} />}

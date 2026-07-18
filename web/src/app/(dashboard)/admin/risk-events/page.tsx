@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { MapPlaceholder } from "@/components/maps/map-placeholder";
+import { AiRiskScanPanel } from "@/components/admin/ai-risk-scan-panel";
 import { RISK_EVENTS } from "@/lib/mock/risk";
 import { formatDate } from "@/lib/format";
 
@@ -34,6 +35,8 @@ export default function AdminRiskEventsPage() {
         markers={RISK_EVENTS.map((e) => ({ label: `${EVENT_TYPE_LABEL[e.type]} · ${e.location.district}` }))}
       />
 
+      <AiRiskScanPanel />
+
       <div className="overflow-x-auto rounded-2xl border border-border">
         <Table>
           <TableHeader>
@@ -59,10 +62,10 @@ export default function AdminRiskEventsPage() {
                 <TableCell className="max-w-48 truncate text-xs text-muted-foreground">{event.source}</TableCell>
                 <TableCell className="capitalize">{event.status}</TableCell>
                 <TableCell className="space-x-1 text-right">
-                  <Button variant="ghost" size="sm" onClick={() => toast.success("Evento confirmado (demo).")}>
+                  <Button variant="ghost" size="sm" onClick={() => toast.success("Evento confirmado.")}>
                     Confirmar
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => toast.info("Evento resuelto (demo).")}>
+                  <Button variant="ghost" size="sm" onClick={() => toast.info("Evento resuelto.")}>
                     Resolver
                   </Button>
                 </TableCell>

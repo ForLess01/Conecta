@@ -1,7 +1,7 @@
 import type { UserRole } from "@/types/domain";
 
-// Demo session: maps each role to the mock actor "logged in" as that role.
-export const DEMO_SESSION_BY_ROLE: Record<UserRole, { id: string; name: string; avatarSeed: string }> = {
+// Local role profiles used while the account API is integrated.
+export const SESSION_BY_ROLE: Record<UserRole, { id: string; name: string; avatarSeed: string }> = {
   productor: { id: "prod-1", name: "Efraín Quispe Mamani", avatarSeed: "efrain-quispe" },
   comprador: { id: "buyer-2", name: "Juan Pablo Rojas", avatarSeed: "juanpablo-rojas" },
   transportista: { id: "trans-1", name: "Wilfredo Chura", avatarSeed: "wilfredo-chura" },

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Bookmark } from "lucide-react";
 import type { Product } from "@/types/domain";
 import { PRODUCERS } from "@/lib/mock/actors";
@@ -16,8 +17,23 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="group flex flex-col rounded-2xl border border-border bg-card overflow-hidden transition-shadow hover:shadow-md">
-      <div className="relative flex h-32 items-center justify-center bg-secondary">
-        <CategoryIcon category={product.category} size={40} className="text-primary" />
+      <div className="relative h-36 overflow-hidden bg-secondary">
+        {product.photos[0] ? (
+          <Image
+            src={product.photos[0]}
+            alt={`${product.name} — ${product.variety}, ${product.location.district}`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <CategoryIcon category={product.category} size={40} className="text-primary" />
+          </div>
+        )}
+        <span className="absolute bottom-2 left-2 flex size-7 items-center justify-center rounded-full bg-card/90 text-primary shadow-sm backdrop-blur">
+          <CategoryIcon category={product.category} size={16} />
+        </span>
         <Button
           variant="ghost"
           size="icon"

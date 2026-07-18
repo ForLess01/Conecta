@@ -144,14 +144,14 @@ export default function PublishRequestPage() {
           <Button variant="ghost" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
             Atrás
           </Button>
-          <Button variant="outline" onClick={() => toast.info("Borrador guardado (demo).")}>
+          <Button variant="outline" onClick={() => toast.info("Borrador guardado.")}>
             Guardar borrador
           </Button>
         </div>
         {isLast ? (
           <Button
             onClick={() => {
-              toast.success("Requerimiento publicado (demo).");
+              toast.success("Requerimiento publicado.");
               router.push("/marketplace");
             }}
           >

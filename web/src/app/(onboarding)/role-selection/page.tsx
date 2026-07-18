@@ -5,29 +5,34 @@ import { useRouter } from "next/navigation";
 import { Sprout, ShoppingBasket, Truck, Building2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { UserRole } from "@/types/domain";
+import type { SelfServiceRole } from "@/lib/roles";
 
-const CARDS: { role: UserRole; label: string; description: string; icon: typeof Sprout }[] = [
+const CARDS: { role: SelfServiceRole; label: string; description: string; icon: typeof Sprout }[] = [
   { role: "productor", label: "Soy productor", description: "Publico productos del campo o crianza para vender.", icon: Sprout },
   { role: "comprador", label: "Soy comprador", description: "Busco productos para mi negocio o restaurante.", icon: ShoppingBasket },
   { role: "transportista", label: "Soy transportista", description: "Ofrezco transporte de carga entre zonas rurales.", icon: Truck },
-  { role: "admin", label: "Represento una organización", description: "Cooperativa, acopiador o empresa que agrupa varios roles.", icon: Building2 },
 ];
 
 export default function RoleSelectionPage() {
   const router = useRouter();
-  const [selected, setSelected] = useState<UserRole[]>([]);
+  const [selected, setSelected] = useState<SelfServiceRole[]>([]);
+  const [profileType, setProfileType] = useState<"person" | "organization">("person");
 
-  function toggle(role: UserRole) {
+  function toggle(role: SelfServiceRole) {
     setSelected((prev) => (prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role]));
   }
 
   function goToOnboarding() {
     const primary = selected[0] ?? "productor";
-    const normalizedPrimary = primary === "admin" ? "productor" : primary;
-    window.localStorage.setItem("conecta.activeRole", normalizedPrimary);
+    window.localStorage.setItem("conecta.activeRole", primary);
     window.localStorage.setItem("conecta.enabledRoles", JSON.stringify(selected.length ? selected : ["productor"]));
-    router.push("/home");
+    window.localStorage.setItem("conecta.profileType", profileType);
+    const ONBOARDING_ROUTE: Record<string, string> = {
+      productor: "/producer",
+      comprador: "/buyer",
+      transportista: "/transporter",
+    };
+    router.push(ONBOARDING_ROUTE[primary] ?? "/producer");
   }
 
   return (
@@ -39,16 +44,55 @@ export default function RoleSelectionPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <section aria-labelledby="profile-type-heading" className="space-y-3">
+        <div>
+          <h2 id="profile-type-heading" className="font-heading text-lg font-semibold">Tipo de perfil</h2>
+          <p className="text-sm text-muted-foreground">El tipo de cuenta no cambia tus permisos ni crea un rol administrativo.</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            aria-pressed={profileType === "person"}
+            onClick={() => setProfileType("person")}
+            className={cn(
+              "flex items-center gap-3 rounded-xl border p-4 text-left transition-colors focus-visible:ring-3 focus-visible:ring-ring/50",
+              profileType === "person" ? "border-primary bg-secondary" : "border-border bg-card hover:bg-muted"
+            )}
+          >
+            <Sprout className="size-5 text-primary" aria-hidden="true" />
+            <span><span className="block font-medium">Persona</span><span className="text-xs text-muted-foreground">Trabajo a título personal.</span></span>
+          </button>
+          <button
+            type="button"
+            aria-pressed={profileType === "organization"}
+            onClick={() => setProfileType("organization")}
+            className={cn(
+              "flex items-center gap-3 rounded-xl border p-4 text-left transition-colors focus-visible:ring-3 focus-visible:ring-ring/50",
+              profileType === "organization" ? "border-primary bg-secondary" : "border-border bg-card hover:bg-muted"
+            )}
+          >
+            <Building2 className="size-5 text-primary" aria-hidden="true" />
+            <span><span className="block font-medium">Organización</span><span className="text-xs text-muted-foreground">Cooperativa, empresa o asociación.</span></span>
+          </button>
+        </div>
+      </section>
+
+      <section aria-labelledby="roles-heading" className="space-y-3">
+        <div>
+          <h2 id="roles-heading" className="font-heading text-lg font-semibold">Roles de trabajo</h2>
+          <p className="text-sm text-muted-foreground">Selecciona uno o varios roles operativos.</p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3">
         {CARDS.map(({ role, label, description, icon: Icon }) => {
           const active = selected.includes(role);
           return (
             <button
               key={role}
               type="button"
+              aria-pressed={active}
               onClick={() => toggle(role)}
               className={cn(
-                "flex flex-col items-start gap-3 rounded-2xl border p-6 text-left transition-colors",
+                "flex flex-col items-start gap-3 rounded-xl border p-5 text-left transition-colors focus-visible:ring-3 focus-visible:ring-ring/50",
                 active ? "border-primary bg-secondary" : "border-border bg-card hover:bg-muted"
               )}
             >
@@ -69,7 +113,8 @@ export default function RoleSelectionPage() {
             </button>
           );
         })}
-      </div>
+        </div>
+      </section>
 
       <Button size="lg" disabled={selected.length === 0} onClick={goToOnboarding} className="self-center px-10">
         Continuar

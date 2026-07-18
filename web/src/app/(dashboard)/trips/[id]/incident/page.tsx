@@ -30,7 +30,7 @@ export default function ReportIncidentPage({ params }: { params: Promise<{ id: s
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              toast.success("Incidencia reportada (demo).");
+              toast.success("Incidencia reportada.");
               router.push(`/trips/${trip.id}`);
             }}
           >
@@ -61,7 +61,7 @@ export default function ReportIncidentPage({ params }: { params: Promise<{ id: s
               <Input id="location" placeholder="Km de referencia o distrito" />
             </div>
             <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              Adjuntar fotografías (demo)
+              Adjuntar fotografías
             </div>
             <div className="flex justify-end gap-2">
               <Button type="button" variant="ghost" onClick={() => router.back()}>Cancelar</Button>

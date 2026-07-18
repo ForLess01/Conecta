@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { LayoutGrid, Map as MapIcon, Search } from "lucide-react";
 import { DesktopTopBar } from "@/components/layout/top-bar";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
 import type { ProductCategory } from "@/types/domain";
 import { CategoryIcon } from "@/components/brand/category-icons";
 import { ShoppingBasket } from "lucide-react";
+import { SponsoredListing } from "@/components/marketplace/sponsored-listing";
 
 const CATEGORIES: { value: ProductCategory | "todas"; label: string }[] = [
   { value: "todas", label: "Todas" },
@@ -25,7 +27,8 @@ const CATEGORIES: { value: ProductCategory | "todas"; label: string }[] = [
 ];
 
 export default function MarketplacePage() {
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [category, setCategory] = useState<ProductCategory | "todas">("todas");
   const [view, setView] = useState<"grid" | "map">("grid");
 
@@ -49,6 +52,10 @@ export default function MarketplacePage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
+              type="search"
+              name="q"
+              aria-label="Buscar productos"
+              autoComplete="off"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar papa, quinua, fibra de alpaca…"
@@ -94,6 +101,8 @@ export default function MarketplacePage() {
         </div>
       </div>
 
+      <SponsoredListing />
+
       {results.length === 0 ? (
         <EmptyState
           icon={ShoppingBasket}
@@ -115,7 +124,7 @@ export default function MarketplacePage() {
           </div>
           <MapPlaceholder
             className="lg:sticky lg:top-20 lg:min-h-[32rem]"
-            label="Vista de mapa con clusters y eventos de riesgo (demo)"
+            label="Vista de mapa con clusters y eventos de riesgo"
             markers={[
               ...results.map((p) => ({ label: p.location.district, risk: p.risk.level })),
               ...RISK_EVENTS.map((e) => ({ label: `Evento: ${e.type}`, risk: undefined })),

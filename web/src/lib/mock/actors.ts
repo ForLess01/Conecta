@@ -1,4 +1,5 @@
 import type { Buyer, Producer, Transporter, Vehicle } from "@/types/domain";
+import { img } from "@/lib/images";
 import { LOCATIONS } from "./locations";
 
 export const PRODUCERS: Producer[] = [
@@ -85,7 +86,7 @@ export const VEHICLES: Vehicle[] = [
     covered: false,
     refrigerated: false,
     is4x4: true,
-    photos: [],
+    photos: [img("pickup", 1000)],
     available: true,
   },
   {
@@ -98,7 +99,7 @@ export const VEHICLES: Vehicle[] = [
     covered: true,
     refrigerated: false,
     is4x4: true,
-    photos: [],
+    photos: [img("ruralCar", 1000)],
     available: true,
   },
   {
@@ -111,7 +112,7 @@ export const VEHICLES: Vehicle[] = [
     covered: true,
     refrigerated: false,
     is4x4: false,
-    photos: [],
+    photos: [img("truck8t", 1000)],
     available: true,
   },
   {
@@ -124,7 +125,7 @@ export const VEHICLES: Vehicle[] = [
     covered: true,
     refrigerated: false,
     is4x4: false,
-    photos: [],
+    photos: [img("truckCargo", 1000)],
     available: false,
   },
   {
@@ -137,7 +138,7 @@ export const VEHICLES: Vehicle[] = [
     covered: true,
     refrigerated: true,
     is4x4: false,
-    photos: [],
+    photos: [img("truckHighway", 1000)],
     available: true,
   },
 ];

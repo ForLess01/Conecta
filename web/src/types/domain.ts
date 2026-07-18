@@ -120,7 +120,6 @@ export interface Product {
   quickOfferEnabled: boolean;
   conversationalEnabled: boolean;
   negotiationWindowHours: number;
-  hiddenFloorPrice: number; // NEVER render this in UI or logs
   priceRange: PriceRange;
   risk: RiskInfo;
   deliveryByProducer: boolean;

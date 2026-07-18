@@ -94,7 +94,7 @@ export default function PublishOfferPage() {
 
           {step === 3 && (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              Arrastra fotografías o haz clic para subir (demo, sin almacenamiento real).
+              Arrastra fotografías o haz clic para subir .
             </div>
           )}
 
@@ -181,14 +181,14 @@ export default function PublishOfferPage() {
           <Button variant="ghost" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
             Atrás
           </Button>
-          <Button variant="outline" onClick={() => toast.info("Borrador guardado (demo).")}>
+          <Button variant="outline" onClick={() => toast.info("Borrador guardado.")}>
             Guardar borrador
           </Button>
         </div>
         {isLast ? (
           <Button
             onClick={() => {
-              toast.success("Producto publicado (demo).");
+              toast.success("Producto publicado.");
               router.push("/marketplace");
             }}
           >

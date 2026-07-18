@@ -26,7 +26,7 @@ export default function RegisterDeliveryPage({ params }: { params: Promise<{ id:
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              toast.success("Entrega confirmada (demo).");
+              toast.success("Entrega confirmada.");
               router.push(`/orders/order-1`);
             }}
           >
@@ -45,7 +45,7 @@ export default function RegisterDeliveryPage({ params }: { params: Promise<{ id:
               <Input id="observed" placeholder="Ej. 20 kg con daño por humedad" />
             </div>
             <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              Adjuntar fotografías de recepción (demo)
+              Adjuntar fotografías de recepción
             </div>
             <div className="flex items-center gap-2">
               <Checkbox id="confirm" required />

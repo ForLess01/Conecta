@@ -41,6 +41,11 @@ export default function OrdersListPage() {
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="font-heading font-semibold tabular-nums">{formatSoles(order.total)}</span>
+                    {order.id === "order-1" && (
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/orders/${order.id}/suppliers`}>Combinar productores</Link>
+                      </Button>
+                    )}
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/orders/${order.id}`}>Ver detalle</Link>
                     </Button>

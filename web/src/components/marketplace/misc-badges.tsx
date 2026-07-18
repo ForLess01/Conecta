@@ -36,16 +36,3 @@ export function QuantityBadge({ label, className }: { label: string; className?:
     </span>
   );
 }
-
-export function DemoBadge({ className }: { className?: string }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full bg-[color:var(--amber)]/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[color:var(--amber)]",
-        className
-      )}
-    >
-      Demostración
-    </span>
-  );
-}

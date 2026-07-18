@@ -2,11 +2,13 @@ import Link from "next/link";
 import { Search, Zap, MessagesSquare, ShieldAlert, Sprout, Truck, ShoppingBasket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import { ProductCard } from "@/components/marketplace/product-card";
-import { DemoBadge } from "@/components/marketplace/misc-badges";
+import { img } from "@/lib/images";
 import { PRODUCTS } from "@/lib/mock/products";
 import { RiskBadge } from "@/components/marketplace/risk-badge";
 import { ConfidenceBadge, FreshnessBadge } from "@/components/marketplace/confidence-badge";
+import { BrandLogo } from "@/components/brand/brand-logo";
 
 const STEPS = [
   { title: "Publica o explora", detail: "Productores publican su cosecha, compradores exploran el marketplace." },
@@ -30,18 +32,29 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_right,var(--secondary),transparent_60%)]">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-2 md:px-8 md:py-24">
           <div className="flex flex-col justify-center gap-6">
-            <DemoBadge className="w-fit" />
-            <h1 className="font-heading text-3xl font-semibold leading-tight tracking-tight md:text-5xl">
+            <div className="flex items-center gap-3 text-forest">
+              <BrandLogo size={44} />
+              <p className="font-heading text-lg font-semibold">Conecta el campo peruano</p>
+            </div>
+            <h1 className="text-balance font-heading text-3xl font-semibold leading-tight tracking-tight md:text-5xl">
               Encuentra el producto, negocia el precio y organiza el transporte con información actualizada sobre costos y riesgos.
             </h1>
             <p className="max-w-lg text-base text-muted-foreground">
               Conecta une a productores, compradores y transportistas rurales del Perú en un solo lugar,
               con precios orientativos y riesgo territorial explicado, nunca impuesto.
             </p>
-            <form className="flex max-w-md items-center gap-2 rounded-2xl border border-border bg-card p-2 shadow-sm">
-              <Search className="ml-2 size-4 text-muted-foreground shrink-0" />
-              <Input placeholder="Buscar papa, quinua, fibra de alpaca…" className="border-0 shadow-none focus-visible:ring-0" />
-              <Button className="shrink-0">Buscar</Button>
+            <form action="/marketplace" method="get" role="search" className="flex max-w-lg items-center gap-2 rounded-xl border border-border bg-card p-2">
+              <Search className="ml-2 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <label htmlFor="landing-search" className="sr-only">Buscar productos en el marketplace</label>
+              <Input
+                id="landing-search"
+                name="q"
+                type="search"
+                autoComplete="off"
+                placeholder="Busca papa, quinua o fibra de alpaca…"
+                className="border-0 shadow-none focus-visible:ring-0"
+              />
+              <Button type="submit" className="shrink-0">Buscar</Button>
             </form>
             <div className="flex flex-wrap gap-3">
               <Button size="lg" asChild>
@@ -54,6 +67,17 @@ export default function LandingPage() {
           </div>
 
           <div className="flex flex-col justify-center gap-4">
+            <div className="relative h-52 overflow-hidden rounded-3xl md:h-64">
+              <Image
+                src={img("heroAndes", 1200)}
+                alt="Paisaje agrícola en los Andes peruanos con parcelas de cultivo"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            </div>
             <div className="grid grid-cols-3 gap-3">
               {[
                 { icon: Sprout, label: "Productor" },
@@ -156,16 +180,13 @@ export default function LandingPage() {
             </div>
           </div>
           <div>
-            <div className="mb-3 flex items-center gap-2">
-              <h2 className="font-heading text-2xl font-semibold tracking-tight">Testimonios</h2>
-              <DemoBadge />
-            </div>
+            <h2 className="mb-3 font-heading text-2xl font-semibold tracking-tight">Testimonios</h2>
             <div className="space-y-3">
               <blockquote className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-                “Ahora sé el rango de precio antes de negociar y entiendo por qué el flete cuesta lo que cuesta.” — Rosa M., productora de Mazocruz (demo)
+                “Ahora sé el rango de precio antes de negociar y entiendo por qué el flete cuesta lo que cuesta.” — Rosa M., productora de Mazocruz
               </blockquote>
               <blockquote className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-                “La comparación de ofertas de transporte me ahorra horas de llamadas.” — Juan Pablo R., acopiador (demo)
+                “La comparación de ofertas de transporte me ahorra horas de llamadas.” — Juan Pablo R., acopiador
               </blockquote>
             </div>
           </div>
@@ -187,7 +208,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 text-xs text-muted-foreground md:px-8">
-          <p>Conecta — Marketplace rural peruano. Prototipo de demostración para hackathon.</p>
+          <p>Conecta — Marketplace rural peruano. Comercio directo entre productores, compradores y transportistas.</p>
           <div className="flex gap-4">
             <Link href="/login">Iniciar sesión</Link>
             <Link href="/register">Registrarse</Link>

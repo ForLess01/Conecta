@@ -19,7 +19,7 @@ const RISK_DOT: Record<string, string> = {
  * Renders a route-like grid with location markers so screens keep their
  * layout and information density without a real map integration.
  */
-export function MapPlaceholder({ className, label = "Mapa de referencia (demo)", markers = [] }: MapPlaceholderProps) {
+export function MapPlaceholder({ className, label = "Mapa de referencia", markers = [] }: MapPlaceholderProps) {
   return (
     <div
       className={cn(

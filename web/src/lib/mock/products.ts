@@ -1,4 +1,5 @@
 import type { Product } from "@/types/domain";
+import { img } from "@/lib/images";
 import { LOCATIONS } from "./locations";
 import { makeRisk } from "./risk";
 
@@ -11,7 +12,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Papa Canchán de segunda cosecha, calibre uniforme, ideal para venta directa y transformación. Almacenada en troje ventilado.",
     quality: "Primera calidad, calibre medio-grande",
-    photos: [],
+    photos: [img("papaCanchan", 1200), img("handsProduce", 1200), img("farmerPeru", 1200)],
     quantityAvailable: 4200,
     minOrder: 200,
     unit: "kg",
@@ -21,7 +22,6 @@ export const PRODUCTS: Product[] = [
     quickOfferEnabled: true,
     conversationalEnabled: true,
     negotiationWindowHours: 48,
-    hiddenFloorPrice: 1.35,
     priceRange: {
       low: 1.3,
       central: 1.55,
@@ -57,7 +57,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Papa nativa Imilla Blanca, cultivada en parcelas altoandinas sin agroquímicos sintéticos. Cosecha reciente.",
     quality: "Selección manual, libre de golpes",
-    photos: [],
+    photos: [img("papaImilla", 1200), img("papaDetail", 1200), img("fieldSunset", 1200)],
     quantityAvailable: 1800,
     minOrder: 100,
     unit: "kg",
@@ -67,7 +67,6 @@ export const PRODUCTS: Product[] = [
     quickOfferEnabled: false,
     conversationalEnabled: true,
     negotiationWindowHours: 72,
-    hiddenFloorPrice: 1.6,
     priceRange: {
       low: 1.55,
       central: 1.85,
@@ -103,7 +102,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Fibra de alpaca clasificada por finura, lista para transformación textil. Empacada en sacos de yute.",
     quality: "Finura 21-23 micras, clasificación manual",
-    photos: [],
+    photos: [img("alpaca", 1200), img("alpacaField", 1200), img("alpacaCloseup", 1200)],
     quantityAvailable: 620,
     minOrder: 20,
     unit: "kg",
@@ -113,7 +112,6 @@ export const PRODUCTS: Product[] = [
     quickOfferEnabled: true,
     conversationalEnabled: true,
     negotiationWindowHours: 24,
-    hiddenFloorPrice: 18.5,
     priceRange: {
       low: 18,
       central: 21,
@@ -149,7 +147,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Quinua blanca orgánica certificada, grano grande, secada al sol y lista para exportación o venta local.",
     quality: "Grano grande, humedad controlada",
-    photos: [],
+    photos: [img("quinuaSacks", 1200), img("quinuaGrain", 1200), img("farmGreen", 1200)],
     quantityAvailable: 3100,
     minOrder: 150,
     unit: "kg",
@@ -159,7 +157,6 @@ export const PRODUCTS: Product[] = [
     quickOfferEnabled: true,
     conversationalEnabled: true,
     negotiationWindowHours: 48,
-    hiddenFloorPrice: 6.2,
     priceRange: {
       low: 6.0,
       central: 6.8,
@@ -195,7 +192,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Cebolla roja de buen calibre, cosecha reciente, ideal para mercados mayoristas.",
     quality: "Calibre medio, sin brotes",
-    photos: [],
+    photos: [img("cebolla", 1200), img("cebollaDetail", 1200), img("market", 1200)],
     quantityAvailable: 5400,
     minOrder: 300,
     unit: "kg",
@@ -205,7 +202,6 @@ export const PRODUCTS: Product[] = [
     quickOfferEnabled: true,
     conversationalEnabled: false,
     negotiationWindowHours: 24,
-    hiddenFloorPrice: 0.95,
     priceRange: {
       low: 0.9,
       central: 1.1,
@@ -241,7 +237,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Trucha fresca del Lago Titicaca, cosechada bajo pedido y transportada en cadena de frío.",
     quality: "Tamaño 300-400 g, eviscerada",
-    photos: [],
+    photos: [img("trucha", 1200), img("truchaDetail", 1200)],
     quantityAvailable: 850,
     minOrder: 50,
     unit: "kg",
@@ -251,7 +247,6 @@ export const PRODUCTS: Product[] = [
     quickOfferEnabled: true,
     conversationalEnabled: true,
     negotiationWindowHours: 12,
-    hiddenFloorPrice: 12.5,
     priceRange: {
       low: 12,
       central: 14,

@@ -35,7 +35,7 @@ export default function NegotiationRoomPage({ params }: { params: Promise<{ id: 
   const product = getProductById(negotiation.productId);
   const counterpart = PRODUCERS.find((p) => p.id === negotiation.producerId) ?? BUYERS.find((b) => b.id === negotiation.buyerId);
   const activeProposal = proposals.find((p) => p.status === "activa");
-  // Fixed demo date (consistent with the rest of the mock dataset) instead of
+  // Fixed reference date (consistent with the local dataset) instead of
   // a Date.now()-derived value, which would be an impure render computation.
   const defaultDeliveryDate = "2026-07-24";
 

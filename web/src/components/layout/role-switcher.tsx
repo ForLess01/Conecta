@@ -3,7 +3,6 @@
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useRole } from "./role-context";
 import { ROLE_LABELS } from "@/lib/mock/session";
-import type { UserRole } from "@/types/domain";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,10 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-const ALL_ROLES: UserRole[] = ["productor", "comprador", "transportista", "admin"];
-
 export function RoleSwitcher({ compact = false }: { compact?: boolean }) {
-  const { activeRole, setActiveRole, currentActor } = useRole();
+  const { activeRole, setActiveRole, enabledRoles, currentActor } = useRole();
 
   return (
     <DropdownMenu>
@@ -46,9 +43,9 @@ export function RoleSwitcher({ compact = false }: { compact?: boolean }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel>Cambiar rol activo (demo)</DropdownMenuLabel>
+        <DropdownMenuLabel>Cambiar rol activo</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {ALL_ROLES.map((role) => (
+        {enabledRoles.map((role) => (
           <DropdownMenuItem key={role} onClick={() => setActiveRole(role)} className="justify-between">
             {ROLE_LABELS[role]}
             {role === activeRole && <Check className="size-4 text-primary" />}

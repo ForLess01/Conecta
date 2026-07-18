@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { DesktopTopBar } from "@/components/layout/top-bar";
 import { NEGOTIATIONS } from "@/lib/mock/negotiations";
 import { getProductById } from "@/lib/mock/products";
@@ -12,6 +13,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { cn } from "@/lib/utils";
 import { MessagesSquare, Search } from "lucide-react";
 import { formatDateTime } from "@/lib/format";
+import { avatarUrl } from "@/lib/avatars";
 
 const FILTERS = [
   { value: "todas", label: "Todas" },
@@ -70,9 +72,19 @@ export default function NegotiationsInboxPage() {
                 href={`/negotiations/${negotiation.id}`}
                 className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted"
               >
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-secondary-foreground">
-                  {counterpart?.name.slice(0, 2).toUpperCase()}
-                </div>
+                {counterpart && avatarUrl(counterpart.id) ? (
+                  <Image
+                    src={avatarUrl(counterpart.id)!}
+                    alt={`Fotografía de ${counterpart.name}`}
+                    width={44}
+                    height={44}
+                    className="size-11 shrink-0 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-secondary-foreground">
+                    {counterpart?.name.slice(0, 2).toUpperCase()}
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <p className="truncate text-sm font-medium">{product?.name} · {counterpart?.name}</p>

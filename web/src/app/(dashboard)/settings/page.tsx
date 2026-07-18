@@ -11,9 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRole } from "@/components/layout/role-context";
 import { ROLE_LABELS } from "@/lib/mock/session";
-import type { UserRole } from "@/types/domain";
-
-const ALL_ROLES: UserRole[] = ["productor", "comprador", "transportista", "admin"];
+import { SELF_SERVICE_ROLES } from "@/lib/roles";
 
 export default function SettingsPage() {
   const { activeRole, setActiveRole, enabledRoles, toggleRole, currentActor } = useRole();
@@ -44,7 +42,7 @@ export default function SettingsPage() {
           <CardTitle className="font-heading text-base">Roles</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {ALL_ROLES.map((role) => (
+          {SELF_SERVICE_ROLES.map((role) => (
             <div key={role} className="flex items-center justify-between rounded-xl border border-border px-3 py-2.5">
               <div>
                 <p className="text-sm font-medium">{ROLE_LABELS[role]}</p>
@@ -56,7 +54,12 @@ export default function SettingsPage() {
                     Activar
                   </Button>
                 )}
-                <Switch checked={enabledRoles.includes(role)} onCheckedChange={() => toggleRole(role)} />
+                <Switch
+                  checked={enabledRoles.includes(role)}
+                  disabled={activeRole === role}
+                  aria-label={`${enabledRoles.includes(role) ? "Desactivar" : "Activar"} rol ${ROLE_LABELS[role]}`}
+                  onCheckedChange={() => toggleRole(role)}
+                />
               </div>
             </div>
           ))}
@@ -114,13 +117,13 @@ export default function SettingsPage() {
           onClick={() => {
             window.localStorage.removeItem("conecta.activeRole");
             window.localStorage.removeItem("conecta.enabledRoles");
-            toast.success("Sesión cerrada (demo).");
+            toast.success("Sesión cerrada.");
             router.push("/login");
           }}
         >
           Cerrar sesión
         </Button>
-        <Button onClick={() => toast.success("Cambios guardados (demo).")}>Guardar cambios</Button>
+        <Button onClick={() => toast.success("Cambios guardados.")}>Guardar cambios</Button>
       </div>
     </div>
   );
