@@ -6,6 +6,7 @@ import {
   ListingTransitionError,
   transitionListingStatus,
 } from "@/lib/server/marketplace/listing-service";
+import { listingSupabaseAdapter } from "@/lib/server/marketplace/listing-supabase-adapter";
 
 const transitionRequestSchema = z.object({
   action: z.enum(["pause", "reactivate", "close"]),
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const listing = await transitionListingStatus(id, parsed.data.action);
+    const listing = await transitionListingStatus(id, parsed.data.action, listingSupabaseAdapter);
     return NextResponse.json(listing);
   } catch (error) {
     if (error instanceof ListingNotFoundError) {

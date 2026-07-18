@@ -43,8 +43,8 @@ export async function listMyVehicles(availableOnly = false): Promise<Vehicle[]> 
   const supabase = await createClient();
   let query = supabase.from("vehicles")
     .select("id,owner_actor_id,display_name,plate,capacity_kg,capacity_m3,covered,refrigerated,four_wheel_drive,status,is_available,vehicle_types:vehicle_type_id(code,name)")
-    .eq("owner_actor_id", actor.id).order("created_at", { ascending: false });
-  if (availableOnly) query = query.eq("status", "ACTIVE").eq("is_available", true);
+    .eq("owner_actor_id", actor.id).eq("status", "ACTIVE").order("created_at", { ascending: false });
+  if (availableOnly) query = query.eq("is_available", true);
   const { data, error } = await query;
   if (error) throw new Error(`Could not load vehicles: ${error.message}`);
   return (data ?? []) as unknown as Vehicle[];
@@ -56,7 +56,7 @@ export async function getMyVehicle(id: string): Promise<Vehicle | null> {
   const supabase = await createClient();
   const { data, error } = await supabase.from("vehicles")
     .select("id,owner_actor_id,display_name,plate,capacity_kg,capacity_m3,covered,refrigerated,four_wheel_drive,status,is_available,vehicle_types:vehicle_type_id(code,name)")
-    .eq("id", id).eq("owner_actor_id", actor.id).maybeSingle();
+    .eq("id", id).eq("owner_actor_id", actor.id).eq("status", "ACTIVE").maybeSingle();
   if (error) throw new Error(`Could not load vehicle: ${error.message}`);
   return data as unknown as Vehicle | null;
 }

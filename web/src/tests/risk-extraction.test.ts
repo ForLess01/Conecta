@@ -216,7 +216,7 @@ describe("risk extraction helpers", () => {
     expect(getRiskScanCacheTtlMs({ RISK_SCAN_CACHE_MINUTES: "0" })).toBe(30 * 60_000);
   });
 
-  it("degrades to fallback candidates when configured Gemini rejects", async () => {
+  it("does not invent risk candidates when configured Gemini rejects", async () => {
     process.env.GEMINI_API_KEY = "configured-test-key";
     geminiMocks.runGroundedRiskExtraction.mockRejectedValueOnce(new Error("Gemini unavailable"));
 
@@ -232,12 +232,7 @@ describe("risk extraction helpers", () => {
 
     expect(geminiMocks.runGroundedRiskExtraction).toHaveBeenCalledOnce();
     expect(result.source).toBe("fallback");
-    expect(result.candidates).toHaveLength(1);
-    expect(result.candidates[0]).toMatchObject({
-      status: "UNCONFIRMED",
-      confidence: 20,
-      citations: [],
-    });
+    expect(result.candidates).toEqual([]);
     expect(result.citations).toEqual([]);
   });
 });

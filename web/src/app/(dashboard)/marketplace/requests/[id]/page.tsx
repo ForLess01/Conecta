@@ -4,15 +4,17 @@ import { DesktopTopBar } from "@/components/layout/top-bar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPlaceholder } from "@/components/maps/map-placeholder";
+import { LocationMap } from "@/components/maps/location-map";
 import { SaveListingButton } from "@/components/marketplace/save-listing-button";
 import { StartConversationButton } from "@/components/negotiation/start-conversation-button";
 import { getActiveListing } from "@/lib/server/marketplace/queries";
+import { getMyActorContext } from "@/lib/supabase/session";
 
 export default async function RequestDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const listing = await getActiveListing(id);
+  const [listing, actor] = await Promise.all([getActiveListing(id), getMyActorContext()]);
   if (!listing || listing.type !== "request") notFound();
+  const canPostulate = actor?.activeRole === "productor" && actor.id !== listing.actorId;
   return (
     <div className="space-y-6">
       <DesktopTopBar title={listing.title} description={`Requerimiento de ${listing.actorName}`} />
@@ -30,7 +32,11 @@ export default async function RequestDetailPage({ params }: { params: Promise<{ 
               <Info label="Cierre" value={listing.deadlineAt ? new Date(listing.deadlineAt).toLocaleDateString("es-PE") : "Sin fecha"} />
             </div>
           </CardContent></Card>
-          <MapPlaceholder label="Destino aproximado" markers={[{ label: listing.locationLabel }]} />
+          <LocationMap label="Destino aproximado" markers={[{
+            label: listing.locationLabel,
+            latitude: listing.approximateLatitude,
+            longitude: listing.approximateLongitude,
+          }]} />
         </div>
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
           <Card><CardContent className="space-y-3 pt-6">
@@ -39,9 +45,9 @@ export default async function RequestDetailPage({ params }: { params: Promise<{ 
             <Button variant="outline" asChild className="w-full"><Link href={`/profiles/${listing.actorId}`}>Ver perfil</Link></Button>
           </CardContent></Card>
           <Card><CardContent className="space-y-2 pt-6">
-            <StartConversationButton listingId={listing.id} label="Postular con propuesta" variant="default" />
-            <StartConversationButton listingId={listing.id} label="Conversar" />
+            {canPostulate && <StartConversationButton listingId={listing.id} label="Conversar y postular" variant="default" />}
             <SaveListingButton listingId={listing.id} initialSaved={listing.saved} inline />
+            {!canPostulate && <p className="text-center text-xs text-muted-foreground">Cambiá al rol productor para postular a este requerimiento.</p>}
           </CardContent></Card>
         </aside>
       </div>

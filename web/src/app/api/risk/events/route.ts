@@ -19,6 +19,9 @@ export const riskEventInputSchema = z.strictObject({
   sourceUrl: z.string().url().nullable().optional(),
 }).refine((value) => (value.latitude === null || value.latitude === undefined) === (value.longitude === null || value.longitude === undefined), {
   message: "Latitude and longitude must be provided together.",
+}).refine((value) => !value.startsAt || !value.endsAt || Date.parse(value.endsAt) >= Date.parse(value.startsAt), {
+  message: "The end date must not be earlier than the start date.",
+  path: ["endsAt"],
 });
 
 export async function GET() {

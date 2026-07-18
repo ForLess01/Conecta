@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPlaceholder } from "@/components/maps/map-placeholder";
+import { LocationMap } from "@/components/maps/location-map";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { completeOnboardingAction } from "../actions";
@@ -88,7 +88,7 @@ export default function BuyerOnboardingPage() {
 
           {step === 3 && (
             <div className="space-y-4">
-              <MapPlaceholder label="Marca tus destinos de entrega" markers={[{ label: "Juliaca" }, { label: "Arequipa" }]} />
+              <LocationMap label="Marca tus destinos de entrega" markers={[{ label: "Juliaca" }, { label: "Arequipa" }]} />
               <div className="space-y-1.5">
                 <Label htmlFor="destination">Destino principal</Label>
                 <Input id="destination" placeholder="Juliaca, Puno" value={destination} onChange={(event) => setDestination(event.target.value)} />

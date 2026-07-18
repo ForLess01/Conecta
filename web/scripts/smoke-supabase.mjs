@@ -22,10 +22,14 @@ let negotiationId;
 let quickNegotiationId;
 let producerUserId;
 let producerActorId;
+let secondProducerUserId;
+let secondProducerActorId;
 let requestListingId;
 let requestLocationId;
 let requestNegotiationId;
+let secondRequestNegotiationId;
 let requestOrderId;
+let chatChannel;
 
 try {
   const { data: created, error: createError } = await admin.auth.admin.createUser({
@@ -54,6 +58,9 @@ try {
   });
   if (listingsError) throw listingsError;
   if (!listings?.length) throw new Error("Seeded marketplace offer was not returned.");
+  for (const field of ["actor_verification_code", "currency_symbol", "price_low", "price_mid", "price_high", "price_confidence", "price_calculated_at"]) {
+    if (!(field in listings[0])) throw new Error(`Marketplace metadata field ${field} was not returned.`);
+  }
 
   const listingId = listings[0].id;
   const { data: saved, error: saveError } = await userClient.rpc("toggle_saved_listing", {
@@ -131,6 +138,30 @@ try {
   if (producerBootstrapError) throw producerBootstrapError;
   producerActorId = producerActor;
 
+  const secondProducerEmail = `smoke-producer-2-${Date.now()}@conecta.test`;
+  const secondProducerPassword = `Smoke-${crypto.randomUUID()}!`;
+  const { data: createdSecondProducer, error: secondProducerCreateError } = await admin.auth.admin.createUser({
+    email: secondProducerEmail,
+    password: secondProducerPassword,
+    email_confirm: true,
+    user_metadata: { full_name: "Conecta Second Producer Smoke" },
+  });
+  if (secondProducerCreateError) throw secondProducerCreateError;
+  secondProducerUserId = createdSecondProducer.user.id;
+  const secondProducerClient = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
+  const { error: secondProducerLoginError } = await secondProducerClient.auth.signInWithPassword({
+    email: secondProducerEmail,
+    password: secondProducerPassword,
+  });
+  if (secondProducerLoginError) throw secondProducerLoginError;
+  const { data: secondProducerActor, error: secondProducerBootstrapError } = await secondProducerClient.rpc("bootstrap_actor", {
+    p_profile_kind: "person",
+    p_role_codes: ["productor"],
+    p_display_name: "Conecta Second Producer Smoke",
+  });
+  if (secondProducerBootstrapError) throw secondProducerBootstrapError;
+  secondProducerActorId = secondProducerActor;
+
   const [{ data: product }, { data: unit }] = await Promise.all([
     admin.from("products").select("id").ilike("code", "POTATO").single(),
     admin.from("units_of_measure").select("id").ilike("code", "KG").single(),
@@ -165,10 +196,56 @@ try {
   if (requestConversationError) throw requestConversationError;
   requestNegotiationId = requestConversation?.[0]?.negotiation_id;
   if (!requestNegotiationId) throw new Error("Request conversation was not created.");
+
+  const chatBody = `Realtime smoke ${crypto.randomUUID()}`;
+  let resolveChatReady;
+  let rejectChatReady;
+  const chatReady = new Promise((resolve, reject) => {
+    resolveChatReady = resolve;
+    rejectChatReady = reject;
+  });
+  await userClient.realtime.setAuth();
+  const realtimeMessage = new Promise((resolve) => {
+    chatChannel = userClient
+      .channel(`negotiation:${requestNegotiationId}`, { config: { private: true } })
+      .on(
+        "broadcast",
+        { event: "INSERT" },
+        ({ payload }) => {
+          if (payload.table === "messages" && payload.record?.body === chatBody) {
+            resolve(payload.record);
+          }
+        },
+      )
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") resolveChatReady();
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          const error = new Error(`Realtime chat subscription failed: ${status}`);
+          rejectChatReady(error);
+        }
+      });
+  });
+  await Promise.race([
+    chatReady,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("Realtime chat subscription did not become ready.")), 10_000)),
+  ]);
+  const { error: chatMessageError } = await producerClient.rpc("commerce_send_message", {
+    p_negotiation_id: requestNegotiationId,
+    p_actor_id: producerActorId,
+    p_body: chatBody,
+  });
+  if (chatMessageError) throw chatMessageError;
+  await Promise.race([
+    realtimeMessage,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("Realtime chat message was not delivered.")), 15_000)),
+  ]);
+  await userClient.removeChannel(chatChannel);
+  chatChannel = undefined;
+
   const { data: proposal, error: proposalError } = await producerClient.rpc("commerce_create_proposal", {
     p_negotiation_id: requestNegotiationId,
     p_actor_id: producerActorId,
-    p_quantity: 100,
+    p_quantity: 60,
     p_unit_price: 2.2,
     p_currency_code: "PEN",
     p_logistics_mode: "BUYER_PICKUP",
@@ -186,18 +263,52 @@ try {
   requestOrderId = accepted?.[0]?.order_id;
   if (!requestOrderId) throw new Error("Request proposal did not create an order.");
 
+  const { data: secondRequestConversation, error: secondRequestConversationError } = await secondProducerClient.rpc(
+    "commerce_create_conversation",
+    { p_listing_id: requestListingId, p_actor_id: secondProducerActorId },
+  );
+  if (secondRequestConversationError) throw secondRequestConversationError;
+  secondRequestNegotiationId = secondRequestConversation?.[0]?.negotiation_id;
+  if (!secondRequestNegotiationId) throw new Error("Second request conversation was not created.");
+  const { data: secondProposal, error: secondProposalError } = await secondProducerClient.rpc("commerce_create_proposal", {
+    p_negotiation_id: secondRequestNegotiationId,
+    p_actor_id: secondProducerActorId,
+    p_quantity: 40,
+    p_unit_price: 2.1,
+    p_currency_code: "PEN",
+    p_logistics_mode: "BUYER_PICKUP",
+  });
+  if (secondProposalError) throw secondProposalError;
+  const { data: secondAccepted, error: secondAcceptanceError } = await userClient.rpc("commerce_respond_to_proposal", {
+    p_negotiation_id: secondRequestNegotiationId,
+    p_proposal_id: secondProposal?.id,
+    p_actor_id: actorId,
+    p_accept: true,
+  });
+  if (secondAcceptanceError) throw secondAcceptanceError;
+  if (secondAccepted?.[0]?.order_id !== requestOrderId) throw new Error("Request suppliers were split across orders.");
+  const { count: supplierItemCount, error: supplierItemError } = await admin
+    .from("order_items")
+    .select("id", { count: "exact", head: true })
+    .eq("order_id", requestOrderId);
+  if (supplierItemError || supplierItemCount !== 2) throw supplierItemError ?? new Error("Combined supplier order is incomplete.");
+
   console.log(JSON.stringify({
     authenticated: true,
     actorBootstrapped: true,
     listingsReturned: listings.length,
+    marketplaceMetadataReturned: true,
     savedToggle: true,
     conversationCreated: true,
+    realtimeChatDelivered: true,
     quickOfferProtected: true,
     adminAuthorization: true,
     dashboardLoaded: true,
     requestProposalAccepted: true,
+    multiSupplierOrderCombined: true,
   }));
 } finally {
+  if (chatChannel) await userClient.removeChannel(chatChannel);
   if (requestOrderId) {
     const { data: items } = await admin.from("order_items").select("id").eq("order_id", requestOrderId);
     const itemIds = (items ?? []).map((item) => item.id);
@@ -212,6 +323,12 @@ try {
     await admin.from("negotiation_participants").delete().eq("negotiation_id", requestNegotiationId);
     await admin.from("negotiations").delete().eq("id", requestNegotiationId);
   }
+  if (secondRequestNegotiationId) {
+    await admin.from("commercial_proposals").delete().eq("negotiation_id", secondRequestNegotiationId);
+    await admin.from("messages").delete().eq("negotiation_id", secondRequestNegotiationId);
+    await admin.from("negotiation_participants").delete().eq("negotiation_id", secondRequestNegotiationId);
+    await admin.from("negotiations").delete().eq("id", secondRequestNegotiationId);
+  }
   if (requestListingId) {
     await admin.from("purchase_requests").delete().eq("listing_id", requestListingId);
     await admin.from("market_listings").delete().eq("id", requestListingId);
@@ -224,6 +341,14 @@ try {
   if (producerUserId) {
     await admin.from("user_roles").delete().eq("user_id", producerUserId);
     await admin.auth.admin.deleteUser(producerUserId);
+  }
+  if (secondProducerActorId) {
+    await admin.from("actor_roles").delete().eq("actor_id", secondProducerActorId);
+    await admin.from("actors").delete().eq("id", secondProducerActorId);
+  }
+  if (secondProducerUserId) {
+    await admin.from("user_roles").delete().eq("user_id", secondProducerUserId);
+    await admin.auth.admin.deleteUser(secondProducerUserId);
   }
   if (actorId) {
     await admin.from("quick_offer_attempts").delete().eq("buyer_actor_id", actorId);

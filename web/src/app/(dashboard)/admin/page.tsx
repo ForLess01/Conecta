@@ -34,7 +34,6 @@ export default async function AdminDashboardPage() {
           { href: "/admin/verification", label: "Verificación de usuarios" },
           { href: "/admin/moderation", label: "Moderación" },
           { href: "/admin/analytics", label: "Analítica" },
-          { href: "/orders", label: "Órdenes" },
         ].map((item) => (
           <Card key={item.href}>
             <CardContent className="flex items-center justify-between pt-6">

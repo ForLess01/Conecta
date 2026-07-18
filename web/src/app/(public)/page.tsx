@@ -54,37 +54,41 @@ const DEMO_ROUTES = [
   { from: "Juli", to: "Puno", km: 82, status: "Acceso disponible" },
 ];
 
-const DEMO_FEATURED: MarketplaceListing[] = PRODUCTS.slice(0, 3).map((product) => ({
-  id: product.id,
-  type: "offer",
-  actorId: product.producerId,
-  actorName: PRODUCERS.find((producer) => producer.id === product.producerId)?.name ?? "Productor de Conecta",
-  productId: product.id,
-  productName: product.name,
-  varietyId: null,
-  varietyName: product.variety,
-  title: product.name,
-  description: product.description,
-  quantity: product.quantityAvailable,
-  unitId: 0,
-  unitSymbol: product.unit,
-  locationLabel: `${product.location.district}, ${product.location.region}`,
-  availableFrom: null,
-  deadlineAt: null,
-  createdAt: product.risk.updatedAt,
-  minimumOrderQuantity: product.minOrder,
-  allowPartialQuantity: false,
-  acceptsPartialOffers: false,
-  acceptsMultipleSuppliers: false,
-  quickNegotiationEnabled: product.quickOfferEnabled,
-  conversationalWindowHours: product.negotiationWindowHours,
-  saved: false,
-}));
-
-function getListingImage(listing: MarketplaceListing) {
-  const listingLabel = `${listing.title} ${listing.productName}`.toLocaleLowerCase("es-PE");
-  return PRODUCTS.find((product) => listingLabel.includes(product.name.toLocaleLowerCase("es-PE")))?.photos[0];
-}
+const DEMO_FEATURED: MarketplaceListing[] = PRODUCTS.slice(0, 3).map((product) => {
+  const producer = PRODUCERS.find((candidate) => candidate.id === product.producerId);
+  return {
+    id: product.id,
+    type: "offer",
+    actorId: product.producerId,
+    actorName: producer?.name ?? "Productor de Conecta",
+    productId: product.id,
+    productName: product.name,
+    varietyId: null,
+    varietyName: product.variety,
+    title: product.name,
+    description: product.description,
+    quantity: product.quantityAvailable,
+    unitId: 0,
+    unitSymbol: product.unit,
+    locationLabel: `${product.location.district}, ${product.location.region}`,
+    availableFrom: null,
+    deadlineAt: null,
+    createdAt: product.risk.updatedAt,
+    minimumOrderQuantity: product.minOrder,
+    allowPartialQuantity: false,
+    acceptsPartialOffers: false,
+    acceptsMultipleSuppliers: false,
+    quickNegotiationEnabled: product.quickOfferEnabled,
+    conversationalWindowHours: product.negotiationWindowHours,
+    saved: false,
+    actorVerification: producer?.verification ?? "sin_verificar",
+    imagePosition: product.category === "fibra_alpaca" ? "center 22%" : undefined,
+    imageUrl: product.photos[0],
+    negotiationMode: product.negotiationMode,
+    priceRange: product.priceRange,
+    risk: product.risk,
+  };
+});
 
 export default async function LandingPage() {
   let featured: MarketplaceListing[];
@@ -294,7 +298,6 @@ export default async function LandingPage() {
                     key={listing.id}
                     listing={listing}
                     canSave={false}
-                    imageSrc={getListingImage(listing)}
                   />
                 ))}
               </div>

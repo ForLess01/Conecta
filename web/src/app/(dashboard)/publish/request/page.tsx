@@ -6,8 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { getMarketplaceCatalogs } from "@/lib/server/catalogs/queries";
 import { createRequest } from "./actions";
+import { getMyActorContext } from "@/lib/supabase/session";
+import { redirect } from "next/navigation";
 
 export default async function PublishRequestPage() {
+  const actor = await getMyActorContext();
+  if (actor?.activeRole !== "comprador") redirect("/home");
   const { products, units } = await getMarketplaceCatalogs();
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -30,7 +34,7 @@ export default async function PublishRequestPage() {
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="acceptsMultiple" defaultChecked /> Aceptar múltiples productores</label>
           </div>
         </CardContent></Card>
-        <div className="flex justify-end gap-2"><Button type="submit" name="intent" value="draft" variant="outline">Guardar borrador</Button><Button type="submit" name="intent" value="publish">Publicar</Button></div>
+        <div className="flex justify-end"><Button type="submit" name="intent" value="publish">Publicar</Button></div>
       </form>
     </div>
   );

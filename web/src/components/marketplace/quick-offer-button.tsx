@@ -29,6 +29,7 @@ export function QuickOfferButton({ listingId, productName, unitSymbol, minimumQu
         const result = await response.json() as QuickOfferResponse | { error?: string };
         if (!response.ok || !("accepted" in result)) throw new Error("error" in result && result.error ? result.error : "No se pudo procesar la oferta.");
         const query = new URLSearchParams({ price: String(offeredPricePerUnit), quantity: String(quantity), attemptsRemaining: String(result.attemptsRemaining) });
+        query.set("status", result.status);
         if (result.orderId) query.set("orderId", result.orderId);
         if (result.negotiationId) query.set("negotiationId", result.negotiationId);
         if (result.reservationExpiresAt) query.set("reservationExpiresAt", result.reservationExpiresAt);

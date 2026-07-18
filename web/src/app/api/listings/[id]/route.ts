@@ -7,6 +7,7 @@ import {
   getListing,
   updateListing,
 } from "@/lib/server/marketplace/listing-service";
+import { listingSupabaseAdapter } from "@/lib/server/marketplace/listing-supabase-adapter";
 
 const updateListingRequestSchema = z.object({
   title: z.string().trim().min(1).max(200).optional(),
@@ -23,7 +24,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
   try {
-    const listing = await getListing(id);
+    const listing = await getListing(id, listingSupabaseAdapter);
     if (!listing) {
       return NextResponse.json({ error: "Listing not found." }, { status: 404 });
     }
@@ -53,7 +54,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const listing = await updateListing(id, parsed.data);
+    const listing = await updateListing(id, parsed.data, listingSupabaseAdapter);
     return NextResponse.json(listing);
   } catch (error) {
     if (error instanceof ListingNotFoundError) {

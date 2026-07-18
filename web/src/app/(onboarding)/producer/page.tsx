@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPlaceholder } from "@/components/maps/map-placeholder";
+import { LocationMap } from "@/components/maps/location-map";
 import { completeOnboardingAction } from "../actions";
 
 const STEPS = ["Identidad", "Ubicación", "Productos", "Capacidad", "Negociación", "Verificación"];
@@ -63,7 +63,7 @@ export default function ProducerOnboardingPage() {
 
           {step === 1 && (
             <div className="space-y-4">
-              <MapPlaceholder label="Selecciona tu ubicación aproximada" />
+              <LocationMap label="Selecciona tu ubicación aproximada" />
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="district">Distrito</Label>

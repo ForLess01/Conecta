@@ -1,11 +1,14 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { ACTIVE_ROLE_COOKIE } from "@/lib/roles";
 import type { UserRole } from "@/types/domain";
 
 export interface ActorContext {
   id: string;
   name: string;
   roles: UserRole[];
+  activeRole: UserRole;
 }
 
 export async function requireUser() {
@@ -39,10 +42,21 @@ export async function getMyActorContext(): Promise<ActorContext | null> {
       role === "productor" || role === "comprador" || role === "transportista",
   );
   if (isAdmin) roles.push("admin");
+  if (roles.length === 0) return null;
+
+  const storedRole = (await cookies()).get(ACTIVE_ROLE_COOKIE)?.value as UserRole | undefined;
+  const activeRole = storedRole && roles.includes(storedRole) ? storedRole : roles[0];
 
   return {
     id: actor.actor_id,
     name: actor.display_name,
     roles,
+    activeRole,
   };
+}
+
+export async function requireActiveRole(allowedRoles: readonly UserRole[]) {
+  const actor = await getMyActorContext();
+  if (!actor || !allowedRoles.includes(actor.activeRole)) redirect("/home");
+  return actor;
 }

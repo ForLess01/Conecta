@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { SELF_SERVICE_ROLE_LABELS as ROLE_LABELS } from "@/lib/roles";
+import { ACTIVE_ROLE_COOKIE, SELF_SERVICE_ROLE_LABELS as ROLE_LABELS } from "@/lib/roles";
 import { SELF_SERVICE_ROLES, type SelfServiceRole } from "@/lib/roles";
 import type { AccountSettings } from "@/lib/server/account/account";
 import { saveRolesAction, saveSettingsAction, signOutAction } from "./actions";
@@ -86,8 +86,8 @@ export function SettingsForm({ initialSettings }: { initialSettings: AccountSett
       <Card><CardHeader><CardTitle className="font-heading text-base">Idioma</CardTitle></CardHeader><CardContent><Select value={settings.language} onValueChange={(language) => language && setSettings({ ...settings, language })}><SelectTrigger className="w-full sm:w-64"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="es">Español</SelectItem><SelectItem value="qu">Quechua</SelectItem><SelectItem value="ay">Aimara</SelectItem></SelectContent></Select></CardContent></Card>
 
       <div className="flex flex-wrap justify-between gap-2">
-        <Button variant="destructive" disabled={isPending} onClick={() => startTransition(async () => { window.localStorage.removeItem("conecta.activeRole"); window.localStorage.removeItem("conecta.enabledRoles"); await signOutAction(); })}>Cerrar sesión</Button>
-        <Button disabled={isPending} onClick={save}>{isPending ? "Guardando..." : "Guardar cambios"}</Button>
+        <Button variant="destructive" disabled={isPending} onClick={() => startTransition(async () => { window.localStorage.removeItem("conecta.activeRole"); window.localStorage.removeItem("conecta.enabledRoles"); document.cookie = `${ACTIVE_ROLE_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`; await signOutAction(); })}>Cerrar sesión</Button>
+        <Button disabled={isPending} onClick={save}>{isPending ? "Guardando…" : "Guardar cambios"}</Button>
       </div>
     </div>
   );

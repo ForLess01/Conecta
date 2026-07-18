@@ -1,6 +1,7 @@
 import type { UserRole } from "@/types/domain";
 
 export type SelfServiceRole = Exclude<UserRole, "admin">;
+export const ACTIVE_ROLE_COOKIE = "conecta.activeRole";
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   productor: "Productor",

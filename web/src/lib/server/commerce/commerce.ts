@@ -3,7 +3,7 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { getMyActorContext } from "@/lib/supabase/session";
 import type { Database } from "@/lib/supabase/types.gen";
-import type { CommerceOrder, NegotiationDetail, NegotiationSummary } from "./types";
+import type { CommerceMessage, CommerceOrder, NegotiationDetail, NegotiationSummary } from "./types";
 
 type RpcClient = Awaited<ReturnType<typeof createClient>>;
 type CommerceFunctionName = Extract<keyof Database["public"]["Functions"], `commerce_${string}`>;
@@ -43,11 +43,18 @@ export async function createConversation(listingId: string) {
 
 export async function sendMessage(negotiationId: string, body: string) {
   const { supabase, actor } = await context();
-  return rpc<"commerce_send_message", { id: string; sender_actor_id: string; body: string; created_at: string }>(
+  const message = await rpc<"commerce_send_message", { id: string; sender_actor_id: string; body: string; created_at: string }>(
     supabase,
     "commerce_send_message",
     { p_negotiation_id: negotiationId, p_actor_id: actor.id, p_body: body },
   );
+  return {
+    id: message.id,
+    senderActorId: message.sender_actor_id,
+    type: "TEXT",
+    body: message.body,
+    createdAt: message.created_at,
+  } satisfies CommerceMessage;
 }
 
 export interface CreateProposalInput {

@@ -5,6 +5,7 @@ import { DesktopTopBar } from "@/components/layout/top-bar";
 import { Button } from "@/components/ui/button";
 import { getOrderLogistics } from "@/lib/server/shipments";
 import { selectLogisticsModeAction } from "@/app/(dashboard)/transport/actions";
+import { requireActiveRole } from "@/lib/supabase/session";
 
 const OPTIONS = [
   { mode: "BUYER_PICKUP", icon: Home, title: "Recoge el comprador", description: "Organiza el transporte con vehículo propio.", detail: "Responsabilidad del comprador" },
@@ -13,6 +14,7 @@ const OPTIONS = [
 ] as const;
 
 export default async function LogisticsModeSelectionPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireActiveRole(["comprador"]);
   const { id } = await params;
   const { order, shipment } = await getOrderLogistics(id);
   if (!order) notFound();

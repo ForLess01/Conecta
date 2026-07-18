@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { DesktopTopBar } from "@/components/layout/top-bar";
 import { Button } from "@/components/ui/button";
-import { MapPlaceholder } from "@/components/maps/map-placeholder";
+import { LocationMap } from "@/components/maps/location-map";
 import { AiRiskScanPanel } from "@/components/admin/ai-risk-scan-panel";
 import { RiskEventsTable } from "@/components/admin/risk-events-table";
 import { listRiskCandidates, listRiskEvents } from "@/lib/server/risk/events";
@@ -17,7 +17,7 @@ export default async function AdminRiskEventsPage() {
         </Button>
       </div>
 
-      <MapPlaceholder
+      <LocationMap
         label="Todos los eventos de riesgo"
         markers={events.map((event) => ({ label: `${event.typeName} · ${event.roadName ?? event.title}` }))}
       />

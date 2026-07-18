@@ -6,8 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { getMarketplaceCatalogs } from "@/lib/server/catalogs/queries";
 import { createOffer } from "./actions";
+import { getMyActorContext } from "@/lib/supabase/session";
+import { redirect } from "next/navigation";
 
 export default async function PublishOfferPage() {
+  const actor = await getMyActorContext();
+  if (actor?.activeRole !== "productor") redirect("/home");
   const { products, units } = await getMarketplaceCatalogs();
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -30,7 +34,7 @@ export default async function PublishOfferPage() {
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="allowPartial" defaultChecked /> Permitir cantidades parciales</label>
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="quickNegotiation" /> Activar negociación rápida</label>
         </CardContent></Card>
-        <div className="flex justify-end gap-2"><Button type="submit" name="intent" value="draft" variant="outline">Guardar borrador</Button><Button type="submit" name="intent" value="publish">Publicar</Button></div>
+        <div className="flex justify-end"><Button type="submit" name="intent" value="publish">Publicar</Button></div>
       </form>
     </div>
   );

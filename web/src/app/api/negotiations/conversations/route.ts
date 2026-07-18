@@ -1,10 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import {
-  ConversationServerConfigurationError,
-  ConversationTransitionError,
-  startConversation,
-} from "@/lib/server/negotiation/conversation-service";
+import { createConversation } from "@/lib/server/commerce/commerce";
 
 const startConversationRequestSchema = z
   .object({
@@ -35,15 +31,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const negotiation = await startConversation(parsed.data);
+    const listingId = parsed.data.offerListingId ?? parsed.data.requestListingId;
+    if (!listingId) return NextResponse.json({ error: "Listing is required." }, { status: 400 });
+    const negotiation = await createConversation(listingId);
     return NextResponse.json(negotiation, { status: 201 });
   } catch (error) {
-    if (error instanceof ConversationTransitionError) {
-      return NextResponse.json({ error: error.message }, { status: 409 });
-    }
-    if (error instanceof ConversationServerConfigurationError) {
-      return NextResponse.json({ error: "Conversations are unavailable." }, { status: 503 });
-    }
-    return NextResponse.json({ error: "Conversation could not be started." }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Conversation could not be started." }, { status: 409 });
   }
 }

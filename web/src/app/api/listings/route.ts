@@ -4,6 +4,7 @@ import {
   ListingServerConfigurationError,
   createListing,
 } from "@/lib/server/marketplace/listing-service";
+import { listingSupabaseAdapter } from "@/lib/server/marketplace/listing-supabase-adapter";
 
 const categorySchema = z.enum(["papa", "fibra_alpaca", "quinua", "cebolla", "trucha"]);
 
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const listing = await createListing(parsed.data);
+    const listing = await createListing(parsed.data, listingSupabaseAdapter);
     return NextResponse.json(listing, { status: 201 });
   } catch (error) {
     if (error instanceof ListingServerConfigurationError) {

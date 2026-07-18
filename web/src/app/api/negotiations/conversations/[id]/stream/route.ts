@@ -1,9 +1,6 @@
 import type { NextRequest } from "next/server";
-import {
-  ConversationPermissionError,
-  getNegotiation,
-  type MessageRecord,
-} from "@/lib/server/negotiation/conversation-service";
+import { getNegotiation } from "@/lib/server/commerce/commerce";
+import type { MessageRecord } from "@/lib/server/negotiation/conversation-service";
 import { subscribeToNegotiation } from "@/lib/server/negotiation/realtime";
 
 interface RouteParams {
@@ -25,15 +22,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const negotiation = await getNegotiation(id, actorId);
+    const negotiation = await getNegotiation(id);
     if (!negotiation) {
       return new Response("Negotiation not found.", { status: 404 });
     }
   } catch (error) {
-    if (error instanceof ConversationPermissionError) {
-      return new Response("Not a participant of this negotiation.", { status: 403 });
-    }
-    return new Response("Negotiation could not be retrieved.", { status: 500 });
+    return new Response(error instanceof Error ? error.message : "Negotiation could not be retrieved.", { status: 403 });
   }
 
   const encoder = new TextEncoder();

@@ -40,14 +40,18 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
     count(supabase.from("negotiations").select("id", { count: "exact", head: true }).in("status", ["OPEN", "OFFER_SUBMITTED", "COUNTERED"])),
     count(supabase.from("shipment_requests").select("id", { count: "exact", head: true }).in("status", ["OPEN_FOR_BIDS", "TRANSPORTER_SELECTED", "SCHEDULED", "PICKED_UP", "IN_TRANSIT", "DELAYED"])),
     count(supabase.from("risk_events").select("id", { count: "exact", head: true }).in("status", ["CONFIRMED", "ACTIVE"])),
-    count(supabase.from("products").select("id", { count: "exact", head: true }).eq("is_active", true)),
+    supabase.from("products").select("id").eq("is_active", true),
     supabase.from("market_price_observations").select("product_id"),
     count(supabase.from("moderation_reports").select("id", { count: "exact", head: true }).in("status", ["OPEN", "REVIEWING"])),
     count(supabase.from("commercial_orders").select("id", { count: "exact", head: true }).eq("status", "COMPLETED")),
   ]);
 
+  if (products.error) throw new Error(`Could not load active products: ${products.error.message}`);
   if (prices.error) throw new Error(`Could not load price coverage: ${prices.error.message}`);
-  const coveredProducts = new Set((prices.data ?? []).map((row) => row.product_id)).size;
+  const activeProductIds = new Set((products.data ?? []).map((row) => row.id));
+  const coveredProducts = new Set(
+    (prices.data ?? []).map((row) => row.product_id).filter((id) => activeProductIds.has(id)),
+  ).size;
 
   return {
     totalUsers: users,
@@ -55,7 +59,7 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
     negotiationsInProgress: negotiations,
     activeShipments: shipments,
     activeRiskEvents: risks,
-    priceCoveragePercent: products ? Math.round((coveredProducts / products) * 100) : 0,
+    priceCoveragePercent: activeProductIds.size ? Math.round((coveredProducts / activeProductIds.size) * 100) : 0,
     openIncidents: reports,
     completedOrders: orders,
   };

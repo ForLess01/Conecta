@@ -1,9 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import {
-  PricingServerConfigurationError,
-  getSuggestedRangeForCategory,
-  getSuggestedRangeForOffer,
-} from "@/lib/server/pricing/pricing-service";
+import { getCategorySuggestion, getOfferSuggestion } from "@/lib/server/pricing/suggestions";
 import type { ProductCategory } from "@/types/domain";
 
 const CATEGORIES: ProductCategory[] = ["papa", "fibra_alpaca", "quinua", "cebolla", "trucha"];
@@ -25,9 +21,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const suggestion = offerListingId
-      ? await getSuggestedRangeForOffer(offerListingId)
+      ? await getOfferSuggestion(offerListingId)
       : isProductCategory(category)
-        ? await getSuggestedRangeForCategory(category)
+        ? await getCategorySuggestion(category)
         : null;
 
     if (!suggestion) {
@@ -35,9 +31,6 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json(suggestion);
   } catch (error) {
-    if (error instanceof PricingServerConfigurationError) {
-      return NextResponse.json({ error: "Price suggestions are unavailable." }, { status: 503 });
-    }
-    return NextResponse.json({ error: "Suggested range could not be retrieved." }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Suggested range could not be retrieved." }, { status: 500 });
   }
 }

@@ -6,6 +6,9 @@ import { reviewVerification } from "@/lib/server/admin/data";
 const schema = z.strictObject({
   status: z.enum(["NEEDS_INFO", "APPROVED", "REJECTED"]),
   notes: z.string().trim().max(1_000).optional(),
+}).refine((value) => value.status === "APPROVED" || Boolean(value.notes), {
+  message: "Review notes are required for this decision.",
+  path: ["notes"],
 });
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {

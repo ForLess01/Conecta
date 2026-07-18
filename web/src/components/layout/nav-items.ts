@@ -29,7 +29,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/home", label: "Inicio", icon: Home, roles: ["productor", "comprador", "transportista", "admin"], mobilePrimary: true },
   { href: "/marketplace", label: "Marketplace", icon: ShoppingBasket, roles: ["productor", "comprador", "transportista", "admin"], mobilePrimary: true },
   { href: "/negotiations", label: "Negociaciones", icon: MessagesSquare, roles: ["productor", "comprador"], mobilePrimary: true },
-  { href: "/orders", label: "Órdenes", icon: ClipboardList, roles: ["productor", "comprador", "admin"] },
+  { href: "/orders", label: "Órdenes", icon: ClipboardList, roles: ["productor", "comprador"] },
   { href: "/transport", label: "Transporte", icon: Truck, roles: ["transportista"], mobilePrimary: true },
   { href: "/vehicles", label: "Mi flota", icon: CarFront, roles: ["transportista"] },
   { href: "/credits", label: "Créditos", icon: Coins, roles: ["transportista"] },

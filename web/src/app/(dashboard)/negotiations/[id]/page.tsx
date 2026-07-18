@@ -8,5 +8,5 @@ export default async function NegotiationRoomPage({ params }: { params: Promise<
   if (!uuidSchema.safeParse(id).success) notFound();
   const negotiation = await getNegotiation(id);
   if (!negotiation) notFound();
-  return <NegotiationRoom negotiation={negotiation} />;
+  return <NegotiationRoom key={id} negotiation={negotiation} />;
 }

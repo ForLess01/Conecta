@@ -7,7 +7,17 @@ import { Button } from "@/components/ui/button";
 import { toggleSavedListing } from "@/lib/server/saved/actions";
 import { cn } from "@/lib/utils";
 
-export function SaveListingButton({ listingId, initialSaved, inline = false }: { listingId: string; initialSaved: boolean; inline?: boolean }) {
+export function SaveListingButton({
+  listingId,
+  initialSaved,
+  inline = false,
+  className,
+}: {
+  listingId: string;
+  initialSaved: boolean;
+  inline?: boolean;
+  className?: string;
+}) {
   const [saved, setSaved] = useState(initialSaved);
   const [pending, startTransition] = useTransition();
 
@@ -30,7 +40,7 @@ export function SaveListingButton({ listingId, initialSaved, inline = false }: {
       size={inline ? "default" : "icon"}
       disabled={pending}
       onClick={toggle}
-      className={cn(!inline && "absolute right-3 top-3 size-8", saved && "text-primary")}
+      className={cn(!inline && "absolute right-3 top-3 size-8", saved && "text-primary", className)}
       aria-label={saved ? "Quitar de guardados" : "Guardar publicación"}
     >
       <Bookmark className={cn("size-4", saved && "fill-current")} />

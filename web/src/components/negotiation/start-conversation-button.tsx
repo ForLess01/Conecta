@@ -22,30 +22,35 @@ export function StartConversationButton({
 
   async function startConversation() {
     setIsStarting(true);
-    const response = await fetch("/api/negotiations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ listingId }),
-    });
-    const payload = (await response.json().catch(() => null)) as {
-      negotiationId?: string;
-      error?: string;
-    } | null;
-    setIsStarting(false);
+    try {
+      const response = await fetch("/api/negotiations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listingId }),
+      });
+      const payload = (await response.json().catch(() => null)) as {
+        negotiationId?: string;
+        error?: string;
+      } | null;
 
-    if (!response.ok || !payload?.negotiationId) {
-      toast.error(payload?.error ?? "No pudimos iniciar la negociación.");
-      return;
+      if (!response.ok || !payload?.negotiationId) {
+        toast.error(payload?.error ?? "No pudimos iniciar la negociación.");
+        return;
+      }
+
+      router.push(`/negotiations/${payload.negotiationId}`);
+      router.refresh();
+    } catch {
+      toast.error("No pudimos conectarnos. Revisá tu conexión e intentá nuevamente.");
+    } finally {
+      setIsStarting(false);
     }
-
-    router.push(`/negotiations/${payload.negotiationId}`);
-    router.refresh();
   }
 
   return (
     <Button type="button" variant={variant} size={size} className="w-full gap-2" onClick={startConversation} disabled={isStarting}>
-      <MessagesSquare className="size-4" />
-      {isStarting ? "Abriendo..." : label}
+      <MessagesSquare className="size-4" aria-hidden="true" />
+      {isStarting ? "Abriendo…" : label}
     </Button>
   );
 }

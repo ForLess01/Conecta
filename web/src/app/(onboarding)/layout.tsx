@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand/brand-logo";
+import { requireUser } from "@/lib/supabase/session";
 
-export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
+export default async function OnboardingLayout({ children }: { children: React.ReactNode }) {
+  await requireUser();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border bg-card">

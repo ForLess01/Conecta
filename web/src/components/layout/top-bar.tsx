@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { ACTIVE_ROLE_COOKIE } from "@/lib/roles";
 
 export function TopBar({ title, unreadCount = 0 }: { title?: string; unreadCount?: number }) {
   const router = useRouter();
@@ -19,6 +20,7 @@ export function TopBar({ title, unreadCount = 0 }: { title?: string; unreadCount
     }
     window.localStorage.removeItem("conecta.activeRole");
     window.localStorage.removeItem("conecta.enabledRoles");
+    document.cookie = `${ACTIVE_ROLE_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
     router.replace("/login");
     router.refresh();
   }

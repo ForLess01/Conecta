@@ -5,6 +5,14 @@ const migration = readFileSync(
   new URL("../../supabase/migrations/20260718162000_commerce_workflows.sql", import.meta.url),
   "utf8",
 );
+const realtimeMigration = readFileSync(
+  new URL("../../supabase/migrations/20260718180000_enable_negotiation_realtime.sql", import.meta.url),
+  "utf8",
+);
+const broadcastMigration = readFileSync(
+  new URL("../../supabase/migrations/20260718181000_broadcast_negotiation_changes.sql", import.meta.url),
+  "utf8",
+);
 
 describe("commerce workflow migration", () => {
   it("defines and protects every commerce RPC", () => {
@@ -33,5 +41,14 @@ describe("commerce workflow migration", () => {
     expect(decisionRpc).toContain("insert into public.commercial_orders");
     expect(decisionRpc).toContain("insert into public.inventory_reservations");
     expect(decisionRpc).not.toContain("hidden_floor_price");
+  });
+
+  it("publishes persisted negotiation changes to realtime clients", () => {
+    expect(realtimeMigration).toContain("alter publication supabase_realtime add table");
+    expect(realtimeMigration).toContain("array['messages', 'commercial_proposals', 'negotiations']");
+    expect(realtimeMigration).toContain("trg_touch_negotiation_from_message");
+    expect(broadcastMigration).toContain("realtime.broadcast_changes");
+    expect(broadcastMigration).toContain("negotiation_participants_receive_broadcasts");
+    expect(broadcastMigration).toContain("public.can_act_as(n.buyer_actor_id)");
   });
 });

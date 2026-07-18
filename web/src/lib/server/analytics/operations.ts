@@ -31,7 +31,10 @@ export async function getOperationsAnalytics(rangeDays: number): Promise<Operati
 
   const terminalNegotiations = (negotiations.data ?? []).filter((item) => ["ACCEPTED", "REJECTED", "EXPIRED", "CANCELLED", "AUTO_ACCEPTED", "NOT_ACCEPTED"].includes(item.status));
   const averageNegotiationHours = average(terminalNegotiations.map((item) => (Date.parse(item.updated_at) - Date.parse(item.created_at)) / 3_600_000));
-  const orderIdsWithShipment = new Set((shipments.data ?? []).map((item) => item.order_id));
+  const orderIds = new Set((orders.data ?? []).map((item) => item.id));
+  const orderIdsWithShipment = new Set(
+    (shipments.data ?? []).map((item) => item.order_id).filter((id): id is string => Boolean(id && orderIds.has(id))),
+  );
   const productTotals = new Map<string, number>();
   for (const item of orderItems.data ?? []) {
     const product = relationName(item.products) ?? "Producto";

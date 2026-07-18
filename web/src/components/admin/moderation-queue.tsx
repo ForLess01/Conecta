@@ -12,9 +12,14 @@ export function ModerationQueue({ reports }: { reports: ModerationReport[] }) {
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
   async function review(id: string, status: "DISMISSED" | "ACTIONED", action: "NONE" | "PAUSE_LISTING" | "CLOSE_LISTING") {
+    const notes = window.prompt("Notas de moderación");
+    if (notes === null) return;
+    if (!notes.trim()) {
+      toast.error("Ingresá una nota para justificar la decisión.");
+      return;
+    }
     setPending(id);
     try {
-      const notes = window.prompt("Notas de moderación") ?? undefined;
       const response = await fetch(`/api/admin/moderation/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status, action, notes }) });
       if (!response.ok) throw new Error("No se pudo resolver el reporte.");
       toast.success(status === "DISMISSED" ? "Reporte descartado." : "Acción de moderación aplicada.");

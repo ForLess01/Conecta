@@ -1,9 +1,12 @@
+import type { NegotiationMode, PriceRange, RiskInfo, VerificationLevel } from "@/types/domain";
+
 export interface MarketplaceListing {
   id: string;
   type: "offer" | "request";
   actorId: string;
   actorName: string;
   productId: string;
+  productCode?: string;
   productName: string;
   varietyId: string | null;
   varietyName: string | null;
@@ -13,6 +16,8 @@ export interface MarketplaceListing {
   unitId: number;
   unitSymbol: string;
   locationLabel: string;
+  approximateLatitude?: number;
+  approximateLongitude?: number;
   availableFrom: string | null;
   deadlineAt: string | null;
   createdAt: string;
@@ -23,4 +28,10 @@ export interface MarketplaceListing {
   quickNegotiationEnabled: boolean;
   conversationalWindowHours: number;
   saved: boolean;
+  actorVerification: VerificationLevel;
+  imagePosition?: string;
+  imageUrl?: string;
+  negotiationMode: NegotiationMode;
+  priceRange: PriceRange | null;
+  risk: RiskInfo | null;
 }

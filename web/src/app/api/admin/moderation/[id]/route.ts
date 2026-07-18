@@ -7,7 +7,11 @@ const schema = z.strictObject({
   status: z.enum(["REVIEWING", "DISMISSED", "ACTIONED"]),
   action: z.enum(["NONE", "PAUSE_LISTING", "CLOSE_LISTING"]).default("NONE"),
   notes: z.string().trim().max(1_000).optional(),
-}).refine((value) => value.status !== "ACTIONED" || value.action !== "NONE");
+}).refine((value) => value.status !== "ACTIONED" || value.action !== "NONE")
+  .refine((value) => value.status === "REVIEWING" || Boolean(value.notes), {
+    message: "Moderation notes are required for a final decision.",
+    path: ["notes"],
+  });
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

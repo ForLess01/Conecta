@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Clock, Send } from "lucide-react";
 import { toast } from "sonner";
@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { CreateProposalDialog } from "@/components/negotiation/create-proposal-dialog";
 import { ProposalCard } from "@/components/negotiation/proposal-card";
 import { formatDateTime } from "@/lib/format";
+import { subscribeToNegotiationStream } from "@/lib/negotiation/realtime-client";
 import { cn } from "@/lib/utils";
-import type { NegotiationDetail } from "@/lib/server/commerce/types";
+import type { CommerceMessage, NegotiationDetail } from "@/lib/server/commerce/types";
 
 async function post(url: string, body: unknown) {
   const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -26,8 +27,22 @@ export function NegotiationRoom({ negotiation }: { negotiation: NegotiationDetai
   const [proposalOpen, setProposalOpen] = useState(false);
   const [counterProposalId, setCounterProposalId] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [liveMessages, setLiveMessages] = useState<CommerceMessage[]>([]);
   const activeProposal = negotiation.proposals.find((proposal) => proposal.status === "ACTIVE");
   const closed = !["OPEN", "OFFER_SUBMITTED", "COUNTERED"].includes(negotiation.status);
+  const messages = [...negotiation.messages, ...liveMessages.filter(
+    (liveMessage) => !negotiation.messages.some((message) => message.id === liveMessage.id),
+  )].sort((left, right) => left.createdAt.localeCompare(right.createdAt));
+
+  useEffect(() => subscribeToNegotiationStream(negotiation.id, (event) => {
+    if (event.type === "refresh") {
+      startTransition(() => router.refresh());
+      return;
+    }
+    setLiveMessages((current) => current.some((message) => message.id === event.message.id)
+      ? current
+      : [...current, event.message]);
+  }), [negotiation.id, router]);
 
   function refresh() {
     startTransition(() => router.refresh());
@@ -37,9 +52,9 @@ export function NegotiationRoom({ negotiation }: { negotiation: NegotiationDetai
     if (!draft.trim() || pending) return;
     setPending(true);
     try {
-      await post(`/api/negotiations/${negotiation.id}/messages`, { body: draft });
+      const message = await post(`/api/negotiations/${negotiation.id}/messages`, { body: draft }) as CommerceMessage;
+      setLiveMessages((current) => current.some((item) => item.id === message.id) ? current : [...current, message]);
       setDraft("");
-      refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "No se pudo enviar el mensaje.");
     } finally {
@@ -69,7 +84,7 @@ export function NegotiationRoom({ negotiation }: { negotiation: NegotiationDetai
       <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         <div className="flex h-[65vh] flex-col rounded-2xl border border-border bg-card">
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            {negotiation.messages.map((message) => {
+            {messages.map((message) => {
               const mine = message.senderActorId === negotiation.actorId;
               const system = message.type !== "TEXT";
               if (system) return <p key={message.id} className="text-center text-xs text-muted-foreground">{message.body}</p>;

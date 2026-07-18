@@ -2,18 +2,32 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HelpCircle, Settings, LogOut } from "lucide-react";
+import { Bell, Settings, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { navForRole } from "./nav-items";
 import { useRole } from "./role-context";
 import { RoleSwitcher } from "./role-switcher";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import { ACTIVE_ROLE_COOKIE } from "@/lib/roles";
 
 export function Sidebar() {
   const { activeRole } = useRole();
   const pathname = usePathname();
   const items = navForRole(activeRole);
+
+  async function signOut() {
+    const { error } = await createClient().auth.signOut();
+    if (error) {
+      toast.error("No pudimos cerrar la sesión.");
+      return;
+    }
+    window.localStorage.removeItem("conecta.activeRole");
+    window.localStorage.removeItem("conecta.enabledRoles");
+    document.cookie = `${ACTIVE_ROLE_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
+    window.location.replace("/login");
+  }
 
   return (
     <aside className="hidden md:flex md:w-64 md:flex-col border-r border-border bg-card h-screen sticky top-0">
@@ -58,19 +72,14 @@ export function Sidebar() {
               href="/notifications"
               className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted"
             >
-              <HelpCircle className="size-4" /> Ayuda
+              <Bell className="size-4" aria-hidden="true" /> Notificaciones
             </Link>
           </div>
           <button
-            onClick={() => {
-              window.localStorage.removeItem("conecta.activeRole");
-              window.localStorage.removeItem("conecta.enabledRoles");
-              toast.success("Sesión cerrada.");
-              window.location.href = "/login";
-            }}
+            onClick={signOut}
             className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10 transition-colors text-left font-medium"
           >
-            <LogOut className="size-4" /> Cerrar sesión
+            <LogOut className="size-4" aria-hidden="true" /> Cerrar sesión
           </button>
         </div>
       </div>

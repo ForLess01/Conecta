@@ -13,7 +13,6 @@ import {
   type GroundedCitation,
   type RawRiskCandidate,
   type RiskCandidate,
-  type RiskEventType,
   type RiskExtractionInput,
   type RiskExtractionResult,
 } from "./schemas";
@@ -133,35 +132,9 @@ export function dedupeRiskCandidates(candidates: RiskCandidate[]): RiskCandidate
   );
 }
 
-const FALLBACK_TYPES: readonly RiskEventType[] = [
-  "lluvia",
-  "via_restringida",
-  "bloqueo",
-  "accidente",
-];
-
 export function createSeededFallback(input: RiskExtractionInput): RawRiskCandidate[] {
-  const seed = stableHash(cacheKey(input));
-  const eventType = FALLBACK_TYPES[seed % FALLBACK_TYPES.length] ?? "via_restringida";
-  const locationLabel = input.route ?? input.district ?? input.province ?? input.region;
-
-  return [
-    {
-      eventType,
-      title: `Monitoreo preventivo para ${locationLabel}`,
-      summary:
-        "Señal de respaldo sin verificación web en vivo. Requiere revisión humana antes de afectar una operación.",
-      location: {
-        region: input.region,
-        province: input.province ?? null,
-        district: input.district ?? null,
-        route: input.route ?? null,
-      },
-      severity: ((seed % 3) + 1) as 1 | 2 | 3,
-      startsAt: null,
-      endsAt: null,
-    },
-  ];
+  riskExtractionInputSchema.parse(input);
+  return [];
 }
 
 function cloneResult(result: RiskExtractionResult, cached: boolean): RiskExtractionResult {

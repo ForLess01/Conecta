@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { img } from "@/lib/images";
-import type { SelfServiceRole } from "@/lib/roles";
+import { ACTIVE_ROLE_COOKIE, isSelfServiceRole, type SelfServiceRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/client";
 
 const QUICK_ACCESS_ROLES: { role: SelfServiceRole; label: string; icon: typeof Sprout }[] = [
@@ -89,14 +89,28 @@ export default function LoginPage() {
       return;
     }
 
-    const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin");
+    const [{ data: isAdmin, error: adminError }, { data: actorRows, error: actorError }] = await Promise.all([
+      supabase.rpc("is_admin"),
+      supabase.rpc("get_my_actor_context"),
+    ]);
     setIsSubmitting(false);
-    if (adminError) {
+    if (adminError || actorError) {
       toast.error("No pudimos cargar los permisos de tu cuenta.");
       return;
     }
 
-    router.replace(isAdmin ? "/admin" : "/home");
+    const actor = actorRows?.[0] as { role_codes?: string[] | null } | undefined;
+    const initialRole = isAdmin ? "admin" : actor?.role_codes?.find(isSelfServiceRole);
+    if (initialRole) {
+      document.cookie = `${ACTIVE_ROLE_COOKIE}=${initialRole}; Path=/; Max-Age=31536000; SameSite=Lax`;
+      window.localStorage.setItem("conecta.activeRole", initialRole);
+    }
+
+    const requestedPath = new URLSearchParams(window.location.search).get("next");
+    const safeNext = requestedPath?.startsWith("/") && !requestedPath.startsWith("//")
+      ? requestedPath
+      : null;
+    router.replace(safeNext ?? (isAdmin ? "/admin" : "/home"));
     router.refresh();
   }
 

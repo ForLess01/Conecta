@@ -11,11 +11,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatSoles } from "@/lib/format";
 import { getOrder } from "@/lib/server/commerce/commerce";
 import { uuidSchema } from "@/lib/server/commerce/validation";
+import { getMyActorContext } from "@/lib/supabase/session";
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!uuidSchema.safeParse(id).success) notFound();
-  const order = await getOrder(id);
+  const [order, actor] = await Promise.all([getOrder(id), getMyActorContext()]);
   if (!order) notFound();
   const timeline = [
     { label: "Orden creada", at: order.createdAt, done: true },
@@ -34,7 +35,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div><p className="text-xs text-muted-foreground">Productos</p><p className="text-sm font-medium">{order.items.map((item) => `${item.productName} (${item.quantity.toLocaleString("es-PE")} ${item.unit})`).join(", ")}</p></div>
         <div><p className="text-xs text-muted-foreground">Total comercial</p><p className="font-heading text-lg font-semibold tabular-nums">{formatSoles(order.total)}</p></div>
         <div><p className="text-xs text-muted-foreground">Estado actual</p><p className="text-sm font-medium">{order.status.replaceAll("_", " ")}</p></div>
-      </CardContent></Card>{["RESERVED", "PENDING_LOGISTICS"].includes(order.status) && <Button asChild><Link href={`/orders/${order.id}/logistics`}>Seleccionar logística</Link></Button>}</TabsContent>
+      </CardContent></Card>{actor?.activeRole === "comprador" && ["RESERVED", "PENDING_LOGISTICS"].includes(order.status) && <Button asChild><Link href={`/orders/${order.id}/logistics`}>Seleccionar logística</Link></Button>}</TabsContent>
       <TabsContent value="productores" className="space-y-3">{order.items.flatMap((item) => item.allocations.map((allocation) => <Card key={allocation.id}><CardContent className="flex flex-wrap items-center justify-between gap-3 pt-6"><div><p className="text-sm font-medium">{allocation.producerName}</p><p className="text-xs text-muted-foreground">{allocation.quantity.toLocaleString("es-PE")} {item.unit} · {formatSoles(allocation.unitPrice)}/{item.unit}</p></div><span className="text-xs text-muted-foreground">{allocation.reservationStatus ?? "Sin reserva"}</span></CardContent></Card>))}</TabsContent>
       <TabsContent value="logistica"><Card><CardContent className="pt-6 text-sm text-muted-foreground">Consulta y selecciona la modalidad logística para continuar.</CardContent></Card></TabsContent>
       <TabsContent value="evidencias"><EmptyState icon={ImageIcon} title="Sin evidencias todavía" description="Las fotos de despacho y recepción aparecerán aquí." /></TabsContent>

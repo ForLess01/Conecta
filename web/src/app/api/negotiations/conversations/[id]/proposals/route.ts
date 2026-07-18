@@ -1,12 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import {
-  ConversationNotFoundError,
-  ConversationPermissionError,
-  ConversationServerConfigurationError,
-  ConversationTransitionError,
-  createProposal,
-} from "@/lib/server/negotiation/conversation-service";
+import { createProposal } from "@/lib/server/commerce/commerce";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -38,21 +32,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const proposal = await createProposal({ negotiationId: id, ...parsed.data });
+    const proposal = await createProposal(id, {
+      quantity: parsed.data.quantity,
+      unitPrice: parsed.data.unitPrice,
+      currencyCode: "PEN",
+      deliveryDate: parsed.data.deliveryDate,
+      logisticsMode: parsed.data.logisticsMode,
+    });
     return NextResponse.json(proposal, { status: 201 });
   } catch (error) {
-    if (error instanceof ConversationNotFoundError) {
-      return NextResponse.json({ error: "Negotiation not found." }, { status: 404 });
-    }
-    if (error instanceof ConversationPermissionError) {
-      return NextResponse.json({ error: "Not a participant of this negotiation." }, { status: 403 });
-    }
-    if (error instanceof ConversationTransitionError) {
-      return NextResponse.json({ error: error.message }, { status: 409 });
-    }
-    if (error instanceof ConversationServerConfigurationError) {
-      return NextResponse.json({ error: "Conversations are unavailable." }, { status: 503 });
-    }
-    return NextResponse.json({ error: "Proposal could not be created." }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Proposal could not be created." }, { status: 409 });
   }
 }
