@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Stepper } from "@/components/shared/stepper";
@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MapPlaceholder } from "@/components/maps/map-placeholder";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { completeOnboardingAction } from "../actions";
 
 const STEPS = ["Tipo", "Organización", "Productos", "Destinos", "Frecuencia", "Facturación"];
 
@@ -22,6 +23,12 @@ const CATALOG = ["Papa", "Quinua", "Fibra de alpaca", "Cebolla", "Trucha"];
 export default function BuyerOnboardingPage() {
   const [step, setStep] = useState(0);
   const [buyerType, setBuyerType] = useState<string | null>(null);
+  const [organization, setOrganization] = useState("");
+  const [ruc, setRuc] = useState("");
+  const [products, setProducts] = useState<string[]>([]);
+  const [destination, setDestination] = useState("");
+  const [frequency, setFrequency] = useState("semanal");
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const isLast = step === STEPS.length - 1;
 
@@ -57,11 +64,11 @@ export default function BuyerOnboardingPage() {
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="org">Empresa u organización</Label>
-                <Input id="org" placeholder="Nombre comercial" />
+                 <Input id="org" placeholder="Nombre comercial" value={organization} onChange={(event) => setOrganization(event.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="ruc">RUC (opcional)</Label>
-                <Input id="ruc" placeholder="20XXXXXXXXX" />
+                 <Input id="ruc" placeholder="20XXXXXXXXX" value={ruc} onChange={(event) => setRuc(event.target.value)} />
               </div>
             </div>
           )}
@@ -72,7 +79,7 @@ export default function BuyerOnboardingPage() {
               <div className="grid gap-2 sm:grid-cols-2">
                 {CATALOG.map((product) => (
                   <label key={product} className="flex items-center gap-2 rounded-xl border border-border px-3 py-2.5 text-sm">
-                    <Checkbox /> {product}
+                    <Checkbox checked={products.includes(product)} onCheckedChange={() => setProducts((current) => current.includes(product) ? current.filter((item) => item !== product) : [...current, product])} /> {product}
                   </label>
                 ))}
               </div>
@@ -84,7 +91,7 @@ export default function BuyerOnboardingPage() {
               <MapPlaceholder label="Marca tus destinos de entrega" markers={[{ label: "Juliaca" }, { label: "Arequipa" }]} />
               <div className="space-y-1.5">
                 <Label htmlFor="destination">Destino principal</Label>
-                <Input id="destination" placeholder="Juliaca, Puno" />
+                <Input id="destination" placeholder="Juliaca, Puno" value={destination} onChange={(event) => setDestination(event.target.value)} />
               </div>
             </div>
           )}
@@ -92,7 +99,7 @@ export default function BuyerOnboardingPage() {
           {step === 4 && (
             <div className="space-y-1.5">
               <Label>Frecuencia de compra</Label>
-              <Select defaultValue="semanal">
+              <Select value={frequency} onValueChange={(value) => value && setFrequency(value)}>
                 <SelectTrigger className="w-full sm:w-64">
                   <SelectValue />
                 </SelectTrigger>
@@ -124,12 +131,18 @@ export default function BuyerOnboardingPage() {
         </Button>
         {isLast ? (
           <Button
-            onClick={() => {
-              toast.success("Perfil de comprador configurado.");
-              router.push("/verification");
-            }}
+             disabled={isPending}
+             onClick={() => startTransition(async () => {
+               try {
+                 await completeOnboardingAction({ role: "comprador", details: { buyerType, organization, ruc, products, destination, frequency } });
+                 toast.success("Perfil de comprador configurado.");
+                 router.push("/verification");
+               } catch (error) {
+                 toast.error(error instanceof Error ? error.message : "No se pudo guardar el perfil.");
+               }
+             })}
           >
-            Finalizar
+             {isPending ? "Guardando..." : "Finalizar"}
           </Button>
         ) : (
           <Button onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}>Siguiente</Button>

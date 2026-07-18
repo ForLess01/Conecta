@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { createClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [requested, setRequested] = useState(false);
 
-  function submitRequest(event: FormEvent<HTMLFormElement>) {
+  async function submitRequest(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const cleanEmail = email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
@@ -22,6 +23,13 @@ export default function ForgotPasswordPage() {
       return;
     }
     setError("");
+    const { error: resetError } = await createClient().auth.resetPasswordForEmail(cleanEmail, {
+      redirectTo: `${window.location.origin}/update-password`,
+    });
+    if (resetError) {
+      setError("No pudimos enviar el enlace. Intenta nuevamente.");
+      return;
+    }
     setRequested(true);
   }
 
@@ -37,7 +45,7 @@ export default function ForgotPasswordPage() {
           <Alert aria-live="polite">
             <MailCheck aria-hidden="true" />
             <AlertTitle>Solicitud registrada</AlertTitle>
-            <AlertDescription>Cuando el servicio de autenticación esté conectado, recibirás aquí el enlace seguro de recuperación.</AlertDescription>
+            <AlertDescription>Si el correo existe, recibirás un enlace seguro para crear una nueva contraseña.</AlertDescription>
           </Alert>
         ) : (
           <form onSubmit={submitRequest} className="space-y-4" noValidate>

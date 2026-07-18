@@ -115,24 +115,42 @@ export function QuickOfferDialog({
             />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label htmlFor="price">Precio por {product.unit}</Label>
-            <Input
-              id="price"
-              type="number"
-              step="0.01"
-              value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-            />
-            <div className="flex gap-2 pt-1">
-              <Button type="button" variant="outline" size="sm" onClick={() => setPrice((p) => Number((p * 0.95).toFixed(2)))}>
-                −5%
+            <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950 text-white p-4">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-zinc-900 hover:text-white text-2xl font-light h-10 w-10 rounded-full select-none"
+                onClick={() => setPrice((p) => Math.max(0.01, Number((p - 0.05).toFixed(2))))}
+              >
+                −
               </Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => setPrice(product.priceRange.central)}>
-                Usar referencia
-              </Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => setPrice((p) => Number((p * 1.05).toFixed(2)))}>
-                +5%
+
+              <div className="flex flex-col items-center flex-1">
+                <div className="flex items-center justify-center">
+                  <span className="text-lg font-semibold mr-1 text-zinc-400">S/</span>
+                  <input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    value={price}
+                    onChange={(e) => setPrice(Number(e.target.value))}
+                    className="bg-transparent text-center border-none text-white text-2xl font-bold focus:ring-0 focus:outline-none w-20 p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+                <span className="text-xs text-zinc-400 mt-0.5 select-none">Precio Sugerido</span>
+              </div>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-zinc-900 hover:text-white text-2xl font-light h-10 w-10 rounded-full select-none"
+                onClick={() => setPrice((p) => Number((p + 0.05).toFixed(2)))}
+              >
+                +
               </Button>
             </div>
           </div>

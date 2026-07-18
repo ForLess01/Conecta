@@ -1,7 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { dedupeRiskCandidates, extractRiskCandidates } from "@/lib/ai/risk-extraction";
-import { ADMIN_SESSION_COOKIE_NAME, hasAdminAccess } from "@/lib/auth/admin-session";
+import { AdminAuthorizationError, getAdminContext } from "@/lib/server/admin/auth";
+import { persistRiskAnalysis } from "@/lib/server/risk/events";
 
 export const riskRegions = ["Puno", "Arequipa"] as const;
 export const riskCorridors = [
@@ -52,11 +53,13 @@ export const riskAnalyzeRequestSchema = z
   });
 
 export async function POST(request: NextRequest) {
-  if (!hasAdminAccess({
-    headerSecret: request.headers.get("x-admin-secret") ?? undefined,
-    sessionToken: request.cookies.get(ADMIN_SESSION_COOKIE_NAME)?.value,
-  })) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  try {
+    await getAdminContext();
+  } catch (error) {
+    if (error instanceof AdminAuthorizationError) {
+      return NextResponse.json({ error: "Supabase ADMIN role required." }, { status: 403 });
+    }
+    throw error;
   }
 
   let body: unknown;
@@ -92,7 +95,9 @@ export async function POST(request: NextRequest) {
       }),
     );
 
-    const events = dedupeRiskCandidates(results.flatMap((result) => result.candidates));
+    const extractedEvents = dedupeRiskCandidates(results.flatMap((result) => result.candidates));
+    const persisted = await persistRiskAnalysis(parsed.data, results, extractedEvents);
+    const events = persisted.candidates;
     const sources = new Set(results.map((result) => result.source));
     const source = sources.size === 1 ? results[0].source : "mixed";
     const generatedAt = latestTimestamp(results.map((result) => result.generatedAt));
@@ -100,6 +105,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       run: {
+        id: persisted.runId,
         status: source === "gemini" ? "completed" : "degraded",
         eventCount: events.length,
       },

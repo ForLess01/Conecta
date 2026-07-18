@@ -1,96 +1,31 @@
-"use client";
-
-import { use, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Check, FileCheck2, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 import { DesktopTopBar } from "@/components/layout/top-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { VEHICLES } from "@/lib/mock/actors";
-import { VEHICLE_LABELS } from "@/lib/mock/vehicle-labels";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getMyVehicle } from "@/lib/server/vehicles";
+import { availabilityAction, deleteVehicleAction, saveVehicleAction } from "../actions";
 
-const DOCUMENTS = ["Tarjeta de propiedad", "SOAT vigente", "Revisión técnica"];
+const TYPES = [["MOTORCYCLE", "Motocarga"], ["PICKUP", "Pickup"], ["VAN", "Furgón"], ["LIGHT_TRUCK", "Camión ligero"], ["MEDIUM_TRUCK", "Camión mediano"], ["HEAVY_TRUCK", "Camión pesado"]];
 
-export default function VehicleDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-  const vehicle = VEHICLES.find((item) => item.id === id);
-  const [available, setAvailable] = useState(vehicle?.available ?? false);
-
-  if (!vehicle) notFound();
-
-  return (
-    <div className="space-y-6">
-      <DesktopTopBar title={vehicle.label} description={`${VEHICLE_LABELS[vehicle.type]} · placa ${vehicle.plate}`} />
-
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        <div className="space-y-4">
-          <div className="relative aspect-[16/9] overflow-hidden rounded-2xl bg-muted">
-            <Image src={vehicle.photos[0]} alt={`${vehicle.label}, placa ${vehicle.plate}`} fill priority className="object-cover" />
-            <Badge className="absolute left-4 top-4" variant={available ? "default" : "secondary"}>
-              {available ? "Disponible" : "No disponible"}
-            </Badge>
-          </div>
-
-          <Card>
-            <CardHeader><CardTitle className="font-heading text-base">Características</CardTitle></CardHeader>
-            <CardContent className="grid gap-3 sm:grid-cols-2">
-              <Detail label="Capacidad máxima" value={`${vehicle.capacityKg.toLocaleString("es-PE")} kg`} />
-              <Detail label="Volumen útil" value={`${vehicle.capacityM3} m³`} />
-              <Detail label="Cobertura" value={vehicle.covered ? "Carga cubierta" : "Carga abierta"} />
-              <Detail label="Refrigeración" value={vehicle.refrigerated ? "Disponible" : "No disponible"} />
-              <Detail label="Tracción 4x4" value={vehicle.is4x4 ? "Sí" : "No"} />
-              <Detail label="Tipo" value={VEHICLE_LABELS[vehicle.type]} />
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <Card>
-            <CardHeader><CardTitle className="font-heading text-base">Documentos declarados</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
-              {DOCUMENTS.map((document) => (
-                <div key={document} className="flex items-center justify-between rounded-xl bg-muted/70 px-3 py-2.5 text-sm">
-                  <span className="flex items-center gap-2"><FileCheck2 className="size-4 text-primary" /> {document}</span>
-                  <Check className="size-4 text-primary" aria-label="Declarado" />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="space-y-2 pt-6">
-              <Button className="w-full" onClick={() => toast.success("Los datos del vehículo están listos para editar.")}>Editar vehículo</Button>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  setAvailable((current) => !current);
-                  toast.success(available ? "Vehículo marcado como no disponible." : "Vehículo disponible para nuevas cargas.");
-                }}
-              >
-                Cambiar disponibilidad
-              </Button>
-              <Button variant="destructive" className="w-full gap-2" onClick={() => toast.error("Confirma la eliminación desde la gestión de flota.")}>
-                <Trash2 className="size-4" /> Eliminar vehículo
-              </Button>
-            </CardContent>
-          </Card>
-          <Button asChild variant="ghost" className="w-full"><Link href="/vehicles">Volver a mi flota</Link></Button>
-        </div>
-      </div>
-    </div>
-  );
+export default async function VehicleDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; const vehicle = await getMyVehicle(id); if (!vehicle) notFound();
+  return <div className="space-y-6"><DesktopTopBar title={vehicle.display_name ?? "Vehículo"} description={`${vehicle.vehicle_types?.name} · placa ${vehicle.plate}`} />
+    <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]"><Card><CardContent className="pt-6"><form action={saveVehicleAction} className="grid gap-4 sm:grid-cols-2">
+      <input type="hidden" name="id" value={vehicle.id} /><Field label="Nombre" name="displayName" defaultValue={vehicle.display_name ?? vehicle.vehicle_types?.name ?? "Vehículo"} required /><Field label="Placa" name="plate" defaultValue={vehicle.plate ?? ""} required />
+      <div className="space-y-1.5"><Label htmlFor="vehicleTypeCode">Tipo</Label><select id="vehicleTypeCode" name="vehicleTypeCode" defaultValue={vehicle.vehicle_types?.code} className="h-9 w-full rounded-lg border bg-transparent px-3 text-sm">{TYPES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}</select></div>
+      <Field label="Capacidad (kg)" name="capacityKg" type="number" defaultValue={vehicle.capacity_kg} required /><Field label="Volumen (m³)" name="capacityM3" type="number" step="0.001" defaultValue={vehicle.capacity_m3 ?? ""} required />
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="covered" defaultChecked={vehicle.covered} /> Carga cubierta</label><label className="flex items-center gap-2 text-sm"><input type="checkbox" name="refrigerated" defaultChecked={vehicle.refrigerated} /> Refrigerado</label><label className="flex items-center gap-2 text-sm"><input type="checkbox" name="fourWheelDrive" defaultChecked={vehicle.four_wheel_drive} /> Tracción 4x4</label>
+      <Button className="sm:col-span-2">Guardar cambios</Button>
+    </form></CardContent></Card>
+    <div className="space-y-4"><Card><CardContent className="space-y-4 pt-6"><div className="flex items-center justify-between"><span className="font-medium">Disponibilidad</span><Badge variant={vehicle.is_available ? "default" : "secondary"}>{vehicle.is_available ? "Disponible" : "No disponible"}</Badge></div>
+      <form action={availabilityAction}><input type="hidden" name="id" value={vehicle.id} /><input type="hidden" name="available" value={String(!vehicle.is_available)} /><Button variant="outline" className="w-full">{vehicle.is_available ? "Marcar no disponible" : "Marcar disponible"}</Button></form>
+      <form action={deleteVehicleAction}><input type="hidden" name="id" value={vehicle.id} /><Button variant="destructive" className="w-full">Eliminar vehículo</Button></form>
+    </CardContent></Card><Button asChild variant="ghost" className="w-full"><Link href="/vehicles">Volver a mi flota</Link></Button></div></div>
+  </div>;
 }
 
-function Detail({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl bg-muted/70 p-3">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-sm font-medium">{value}</p>
-    </div>
-  );
-}
+function Field({ label, name, ...props }: { label: string; name: string } & React.ComponentProps<typeof Input>) { return <div className="space-y-1.5"><Label htmlFor={name}>{label}</Label><Input id={name} name={name} {...props} /></div>; }

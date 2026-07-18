@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Stepper } from "@/components/shared/stepper";
@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MapPlaceholder } from "@/components/maps/map-placeholder";
+import { completeOnboardingAction } from "../actions";
 
 const STEPS = ["Identidad", "Ubicación", "Productos", "Capacidad", "Negociación", "Verificación"];
 
@@ -20,6 +21,17 @@ const CATALOG = ["Papa Canchán", "Papa Imilla", "Fibra de alpaca", "Quinua blan
 export default function ProducerOnboardingPage() {
   const [step, setStep] = useState(0);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [district, setDistrict] = useState("");
+  const [province, setProvince] = useState("");
+  const [region, setRegion] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [unit, setUnit] = useState("kg");
+  const [quickNegotiation, setQuickNegotiation] = useState(true);
+  const [negotiationWindow, setNegotiationWindow] = useState("48");
+  const [documents, setDocuments] = useState<string[]>([]);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const isLast = step === STEPS.length - 1;
 
@@ -37,11 +49,11 @@ export default function ProducerOnboardingPage() {
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="name">Nombre completo</Label>
-                <Input id="name" placeholder="Nombre y apellidos" />
+                 <Input id="name" placeholder="Nombre y apellidos" value={name} onChange={(event) => setName(event.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="phone">Teléfono</Label>
-                <Input id="phone" placeholder="9XX XXX XXX" />
+                 <Input id="phone" placeholder="9XX XXX XXX" value={phone} onChange={(event) => setPhone(event.target.value)} />
               </div>
               <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                 Sube una foto de perfil
@@ -55,15 +67,15 @@ export default function ProducerOnboardingPage() {
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="district">Distrito</Label>
-                  <Input id="district" placeholder="Acora" />
+                   <Input id="district" placeholder="Acora" value={district} onChange={(event) => setDistrict(event.target.value)} />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="province">Provincia</Label>
-                  <Input id="province" placeholder="Puno" />
+                   <Input id="province" placeholder="Puno" value={province} onChange={(event) => setProvince(event.target.value)} />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="region">Región</Label>
-                  <Input id="region" placeholder="Puno" />
+                   <Input id="region" placeholder="Puno" value={region} onChange={(event) => setRegion(event.target.value)} />
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
@@ -100,11 +112,11 @@ export default function ProducerOnboardingPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="capacity">Capacidad productiva</Label>
-                <Input id="capacity" type="number" placeholder="5000" />
+                 <Input id="capacity" type="number" placeholder="5000" value={capacity} onChange={(event) => setCapacity(event.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label>Unidad</Label>
-                <Select defaultValue="kg">
+                 <Select value={unit} onValueChange={(value) => value && setUnit(value)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -125,11 +137,11 @@ export default function ProducerOnboardingPage() {
                   <p className="text-sm font-medium">Aceptar negociación rápida</p>
                   <p className="text-xs text-muted-foreground">Ofertas con match inmediato si alcanzan tu mínimo privado.</p>
                 </div>
-                <Switch defaultChecked />
+                 <Switch checked={quickNegotiation} onCheckedChange={setQuickNegotiation} />
               </div>
               <div className="space-y-1.5">
                 <Label>Ventana de negociación preferida</Label>
-                <Select defaultValue="48">
+                 <Select value={negotiationWindow} onValueChange={(value) => value && setNegotiationWindow(value)}>
                   <SelectTrigger className="w-full sm:w-48">
                     <SelectValue />
                   </SelectTrigger>
@@ -151,7 +163,7 @@ export default function ProducerOnboardingPage() {
               </p>
               {["DNI", "Constancia de posesión o título", "Registro sanitario (si aplica)"].map((doc) => (
                 <label key={doc} className="flex items-center gap-2 rounded-xl border border-border px-3 py-2.5 text-sm">
-                  <Checkbox /> {doc}
+                   <Checkbox checked={documents.includes(doc)} onCheckedChange={() => setDocuments((current) => current.includes(doc) ? current.filter((item) => item !== doc) : [...current, doc])} /> {doc}
                 </label>
               ))}
             </div>
@@ -172,12 +184,21 @@ export default function ProducerOnboardingPage() {
         </div>
         {isLast ? (
           <Button
-            onClick={() => {
-              toast.success("Perfil de productor configurado.");
-              router.push("/verification");
-            }}
+             disabled={isPending}
+             onClick={() => startTransition(async () => {
+               try {
+                 await completeOnboardingAction({
+                   role: "productor", name, phone,
+                   details: { location: { district, province, region }, products: selectedProducts, capacity: capacity ? Number(capacity) : null, unit, quickNegotiation, negotiationWindowHours: Number(negotiationWindow), declaredDocuments: documents },
+                 });
+                 toast.success("Perfil de productor configurado.");
+                 router.push("/verification");
+               } catch (error) {
+                 toast.error(error instanceof Error ? error.message : "No se pudo guardar el perfil.");
+               }
+             })}
           >
-            Finalizar
+             {isPending ? "Guardando..." : "Finalizar"}
           </Button>
         ) : (
           <Button onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}>Siguiente</Button>

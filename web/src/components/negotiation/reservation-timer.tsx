@@ -3,15 +3,21 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
-export function ReservationTimer({ minutes, className }: { minutes: number; className?: string }) {
-  const [secondsLeft, setSecondsLeft] = useState(minutes * 60);
+function secondsUntil(expiresAt?: string, minutes?: number) {
+  return expiresAt
+    ? Math.max(0, Math.ceil((new Date(expiresAt).getTime() - Date.now()) / 1000))
+    : (minutes ?? 0) * 60;
+}
+
+export function ReservationTimer({ minutes, expiresAt, className }: { minutes?: number; expiresAt?: string; className?: string }) {
+  const [secondsLeft, setSecondsLeft] = useState(() => secondsUntil(expiresAt, minutes));
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setSecondsLeft((s) => Math.max(0, s - 1));
+      setSecondsLeft(secondsUntil(expiresAt, minutes));
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [expiresAt, minutes]);
 
   const mm = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const ss = String(secondsLeft % 60).padStart(2, "0");

@@ -2,7 +2,7 @@
 
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useRole } from "./role-context";
-import { ROLE_LABELS } from "@/lib/mock/session";
+import { ROLE_LABELS } from "@/lib/roles";
 import {
   DropdownMenu,
   DropdownMenuContent,

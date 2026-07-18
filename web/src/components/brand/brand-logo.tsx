@@ -13,12 +13,13 @@ interface BrandLogoProps {
 }
 
 export function BrandLogo({ size = 32, className, tile = false }: BrandLogoProps) {
+  const doubledSize = size * 2;
   const image = (
     <Image
       src="/logo-conecta.png"
       alt="Conecta"
-      width={size}
-      height={size}
+      width={doubledSize}
+      height={doubledSize}
       className={cn("rounded-lg object-cover", !tile && className)}
       priority
     />

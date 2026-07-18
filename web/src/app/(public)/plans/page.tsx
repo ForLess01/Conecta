@@ -4,9 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 const PLANS = [
-  { name: "Gratuito", price: "S/ 0", description: "Para comprar de forma directa.", features: ["Marketplace completo", "Negociaciones y órdenes", "Alertas esenciales"] },
-  { name: "Profesional", price: "S/ 89 / mes", description: "Para equipos de compra recurrente.", features: ["Filtros avanzados", "Alertas personalizadas", "Comparación de proveedores"] },
-  { name: "Empresarial", price: "A medida", description: "Para organizaciones con varias sedes.", features: ["Usuarios y permisos", "Analítica consolidada", "Acompañamiento dedicado"] },
+  { name: "Gratuito", price: "S/ 0", description: "Para comprar de forma directa.", features: ["Marketplace completo", "Negociaciones y órdenes", "Alertas esenciales"], href: "/register", action: "Crear cuenta gratuita" },
+  { name: "Profesional", price: "S/ 89 / mes", description: "Para equipos de compra recurrente.", features: ["Filtros avanzados", "Alertas personalizadas", "Comparación de proveedores"], href: "mailto:contacto@conecta.pe?subject=Plan%20Profesional", action: "Solicitar información" },
+  { name: "Empresarial", price: "A medida", description: "Para organizaciones con varias sedes.", features: ["Usuarios y permisos", "Analítica consolidada", "Acompañamiento dedicado"], href: "mailto:contacto@conecta.pe?subject=Plan%20Empresarial", action: "Contactar" },
 ];
 
 export default function PlansPage() {
@@ -26,7 +26,7 @@ export default function PlansPage() {
             <ul className="my-6 flex-1 space-y-3 text-sm">
               {plan.features.map((feature) => <li key={feature} className="flex gap-2"><Check className="mt-0.5 size-4 text-primary" /> {feature}</li>)}
             </ul>
-            <Button disabled className="w-full">Elegir plan</Button>
+            <Button asChild className="w-full"><Link href={plan.href}>{plan.action}</Link></Button>
           </section>
         ))}
       </div>

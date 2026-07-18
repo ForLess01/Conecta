@@ -1,203 +1,44 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { DesktopTopBar } from "@/components/layout/top-bar";
-import { Stepper } from "@/components/shared/stepper";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProductCard } from "@/components/marketplace/product-card";
-import { PRODUCTS } from "@/lib/mock/products";
+import { getMarketplaceCatalogs } from "@/lib/server/catalogs/queries";
+import { createOffer } from "./actions";
 
-const STEPS = [
-  "Producto",
-  "Calidad",
-  "Cantidad",
-  "Fotografías",
-  "Ubicación",
-  "Negociación",
-  "Logística",
-  "Vista previa",
-];
-
-export default function PublishOfferPage() {
-  const [step, setStep] = useState(0);
-  const [quickEnabled, setQuickEnabled] = useState(true);
-  const [conversationalEnabled, setConversationalEnabled] = useState(true);
-  const router = useRouter();
-  const previewProduct = PRODUCTS[0];
-
-  const isLast = step === STEPS.length - 1;
-
+export default async function PublishOfferPage() {
+  const { products, units } = await getMarketplaceCatalogs();
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <DesktopTopBar title="Publicar producto" description="Completa los 8 pasos para publicar tu producto en el marketplace." />
-      <Stepper steps={STEPS} currentStep={step} />
-
-      <Card>
-        <CardContent className="space-y-4 pt-6">
-          {step === 0 && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label>Producto del catálogo</Label>
-                <Select defaultValue="papa">
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="papa">Papa</SelectItem>
-                    <SelectItem value="quinua">Quinua</SelectItem>
-                    <SelectItem value="fibra_alpaca">Fibra de alpaca</SelectItem>
-                    <SelectItem value="cebolla">Cebolla</SelectItem>
-                    <SelectItem value="trucha">Trucha</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="variety">Variedad</Label>
-                <Input id="variety" placeholder="Ej. Canchán INIA" />
-              </div>
-            </div>
-          )}
-
-          {step === 1 && (
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="quality">Calidad y atributos</Label>
-                <Textarea id="quality" placeholder="Primera calidad, calibre medio-grande…" />
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="quantity">Cantidad disponible</Label>
-                <Input id="quantity" type="number" defaultValue={1000} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="unit">Unidad</Label>
-                <Input id="unit" defaultValue="kg" />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="min">Pedido mínimo</Label>
-                <Input id="min" type="number" defaultValue={100} />
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              Arrastra fotografías o haz clic para subir .
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="district">Distrito</Label>
-                <Input id="district" defaultValue="Acora" />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="province">Provincia</Label>
-                <Input id="province" defaultValue="Puno" />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="region">Región</Label>
-                <Input id="region" defaultValue="Puno" />
-              </div>
-            </div>
-          )}
-
-          {step === 5 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-xl border border-border p-3">
-                <div>
-                  <p className="text-sm font-medium">Negociación rápida</p>
-                  <p className="text-xs text-muted-foreground">Permite ofertas con reserva de 15 minutos.</p>
-                </div>
-                <Switch checked={quickEnabled} onCheckedChange={setQuickEnabled} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="floor">Mínimo privado por unidad</Label>
-                <Input id="floor" type="number" step="0.01" placeholder="Ej. 1.35" />
-                <p className="text-xs text-muted-foreground">
-                  Este valor nunca será visible al comprador ni se mostrará cuánto faltó para alcanzarlo.
-                </p>
-              </div>
-              <div className="flex items-center justify-between rounded-xl border border-border p-3">
-                <div>
-                  <p className="text-sm font-medium">Negociación conversacional</p>
-                  <p className="text-xs text-muted-foreground">Permite chat y propuestas estructuradas.</p>
-                </div>
-                <Switch checked={conversationalEnabled} onCheckedChange={setConversationalEnabled} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Ventana de negociación</Label>
-                <Select defaultValue="48">
-                  <SelectTrigger className="w-full sm:w-48">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="12">12 horas</SelectItem>
-                    <SelectItem value="24">24 horas</SelectItem>
-                    <SelectItem value="48">48 horas</SelectItem>
-                    <SelectItem value="72">72 horas</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
-
-          {step === 6 && (
-            <div className="flex items-center justify-between rounded-xl border border-border p-3">
-              <div>
-                <p className="text-sm font-medium">Entrega propia</p>
-                <p className="text-xs text-muted-foreground">¿Puedes entregar el producto tú mismo?</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-          )}
-
-          {step === 7 && (
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">Vista previa de la tarjeta de tu producto:</p>
-              <div className="max-w-xs">
-                <ProductCard product={previewProduct} />
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <div className="flex flex-wrap justify-between gap-2">
-        <div className="flex gap-2">
-          <Button variant="ghost" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
-            Atrás
-          </Button>
-          <Button variant="outline" onClick={() => toast.info("Borrador guardado.")}>
-            Guardar borrador
-          </Button>
+      <DesktopTopBar title="Publicar producto" description="Creá una oferta activa con datos reales del catálogo." />
+      <form action={createOffer} className="space-y-5">
+        <Card><CardContent className="grid gap-4 pt-6 sm:grid-cols-2">
+          <Field label="Producto" htmlFor="productId"><select id="productId" name="productId" required className="h-9 w-full rounded-md border bg-transparent px-3 text-sm"><option value="">Seleccionar</option>{products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></Field>
+          <Field label="Variedad (opcional)" htmlFor="varietyId"><select id="varietyId" name="varietyId" className="h-9 w-full rounded-md border bg-transparent px-3 text-sm"><option value="">Sin variedad</option>{products.flatMap((p) => p.varieties.map((v) => <option key={v.id} value={v.id}>{p.name} · {v.name}</option>))}</select></Field>
+          <Field label="Título" htmlFor="title" wide><Input id="title" name="title" required placeholder="Ej. Papa Canchán seleccionada" /></Field>
+          <Field label="Descripción" htmlFor="description" wide><Textarea id="description" name="description" placeholder="Calidad, cosecha y condiciones de entrega" /></Field>
+          <Field label="Cantidad" htmlFor="quantity"><Input id="quantity" name="quantity" type="number" min="0.01" step="0.01" required /></Field>
+          <Field label="Unidad" htmlFor="unitId"><select id="unitId" name="unitId" required className="h-9 w-full rounded-md border bg-transparent px-3 text-sm"><option value="">Seleccionar</option>{units.map((u) => <option key={u.id} value={u.id}>{u.name} ({u.symbol})</option>)}</select></Field>
+          <Field label="Pedido mínimo" htmlFor="minimumOrderQuantity"><Input id="minimumOrderQuantity" name="minimumOrderQuantity" type="number" min="0.01" step="0.01" required /></Field>
+          <Field label="Disponible desde" htmlFor="availableFrom"><Input id="availableFrom" name="availableFrom" type="date" /></Field>
+          <Field label="Ubicación aproximada" htmlFor="locationLabel" wide><Input id="locationLabel" name="locationLabel" required placeholder="Ej. Acora, Puno" /></Field>
+          <Field label="Latitud" htmlFor="latitude"><Input id="latitude" name="latitude" type="number" min="-90" max="90" step="0.000001" required /></Field>
+          <Field label="Longitud" htmlFor="longitude"><Input id="longitude" name="longitude" type="number" min="-180" max="180" step="0.000001" required /></Field>
+          <Field label="Ventana de conversación (horas)" htmlFor="conversationHours"><Input id="conversationHours" name="conversationHours" type="number" min="1" defaultValue="24" required /></Field>
+          <Field label="Mínimo privado por unidad" htmlFor="hiddenFloorPrice"><Input id="hiddenFloorPrice" name="hiddenFloorPrice" type="number" min="0.01" step="0.01" /><p className="text-xs text-muted-foreground">Obligatorio si activás negociación rápida. Nunca se expone al comprador.</p></Field>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="allowPartial" defaultChecked /> Permitir cantidades parciales</label>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="quickNegotiation" /> Activar negociación rápida</label>
+        </CardContent></Card>
+        <div className="flex justify-end gap-2">
+          <Button type="submit" name="intent" value="draft" variant="outline">Guardar borrador</Button>
+          <Button type="submit" name="intent" value="publish">Publicar</Button>
         </div>
-        {isLast ? (
-          <Button
-            onClick={() => {
-              toast.success("Producto publicado.");
-              router.push("/marketplace");
-            }}
-          >
-            Publicar
-          </Button>
-        ) : (
-          <Button onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}>Siguiente</Button>
-        )}
-      </div>
+      </form>
     </div>
   );
+}
+
+function Field({ label, htmlFor, wide, children }: { label: string; htmlFor: string; wide?: boolean; children: React.ReactNode }) {
+  return <div className={`space-y-1.5 ${wide ? "sm:col-span-2" : ""}`}><Label htmlFor={htmlFor}>{label}</Label>{children}</div>;
 }

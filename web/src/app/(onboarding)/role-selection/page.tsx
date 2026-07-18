@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Sprout, ShoppingBasket, Truck, Building2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { SelfServiceRole } from "@/lib/roles";
+import { bootstrapAccountAction } from "../actions";
 
 const CARDS: { role: SelfServiceRole; label: string; description: string; icon: typeof Sprout }[] = [
   { role: "productor", label: "Soy productor", description: "Publico productos del campo o crianza para vender.", icon: Sprout },
@@ -17,22 +19,34 @@ export default function RoleSelectionPage() {
   const router = useRouter();
   const [selected, setSelected] = useState<SelfServiceRole[]>([]);
   const [profileType, setProfileType] = useState<"person" | "organization">("person");
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    const pendingRole = window.localStorage.getItem("conecta.pendingRole");
+    if (pendingRole === "productor" || pendingRole === "comprador" || pendingRole === "transportista") {
+      // One-time hydration from the role-specific registration entry point.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelected([pendingRole]);
+      window.localStorage.removeItem("conecta.pendingRole");
+    }
+  }, []);
 
   function toggle(role: SelfServiceRole) {
     setSelected((prev) => (prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role]));
   }
 
   function goToOnboarding() {
-    const primary = selected[0] ?? "productor";
-    window.localStorage.setItem("conecta.activeRole", primary);
-    window.localStorage.setItem("conecta.enabledRoles", JSON.stringify(selected.length ? selected : ["productor"]));
-    window.localStorage.setItem("conecta.profileType", profileType);
-    const ONBOARDING_ROUTE: Record<string, string> = {
-      productor: "/producer",
-      comprador: "/buyer",
-      transportista: "/transporter",
-    };
-    router.push(ONBOARDING_ROUTE[primary] ?? "/producer");
+    startTransition(async () => {
+      try {
+        const route = await bootstrapAccountAction(profileType, selected);
+        window.localStorage.setItem("conecta.activeRole", selected[0]);
+        window.localStorage.setItem("conecta.enabledRoles", JSON.stringify(selected));
+        window.localStorage.setItem("conecta.profileType", profileType);
+        router.push(route);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "No se pudo crear el perfil operativo.");
+      }
+    });
   }
 
   return (
@@ -116,8 +130,8 @@ export default function RoleSelectionPage() {
         </div>
       </section>
 
-      <Button size="lg" disabled={selected.length === 0} onClick={goToOnboarding} className="self-center px-10">
-        Continuar
+      <Button size="lg" disabled={selected.length === 0 || isPending} onClick={goToOnboarding} className="self-center px-10">
+        {isPending ? "Guardando..." : "Continuar"}
       </Button>
     </div>
   );

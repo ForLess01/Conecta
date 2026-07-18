@@ -1,13 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { Bell } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Bell, LogOut } from "lucide-react";
+import { toast } from "sonner";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { Button } from "@/components/ui/button";
-import { NOTIFICATIONS } from "@/lib/mock/notifications";
+import { createClient } from "@/lib/supabase/client";
 
-export function TopBar({ title }: { title?: string }) {
-  const unread = NOTIFICATIONS.filter((n) => !n.read).length;
+export function TopBar({ title, unreadCount = 0 }: { title?: string; unreadCount?: number }) {
+  const router = useRouter();
+
+  async function signOut() {
+    const { error } = await createClient().auth.signOut();
+    if (error) {
+      toast.error("No pudimos cerrar la sesión.");
+      return;
+    }
+    window.localStorage.removeItem("conecta.activeRole");
+    window.localStorage.removeItem("conecta.enabledRoles");
+    router.replace("/login");
+    router.refresh();
+  }
 
   return (
     <header className="md:hidden sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-3">
@@ -19,15 +33,23 @@ export function TopBar({ title }: { title?: string }) {
           <span className="font-heading text-sm font-semibold">Conecta</span>
         )}
       </Link>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <Button variant="ghost" size="icon" asChild className="relative">
-          <Link href="/notifications" aria-label={`Notificaciones: ${unread} sin leer`}>
+          <Link href="/notifications" aria-label={`Notificaciones: ${unreadCount} sin leer`}>
             <Bell className="size-5" aria-hidden="true" />
-            {unread > 0 && (
+            {unreadCount > 0 && (
               <span aria-hidden="true" className="absolute top-1 right-1 size-2 rounded-full bg-destructive" />
             )}
-            <span className="sr-only">{unread} notificaciones sin leer</span>
+            <span className="sr-only">{unreadCount} notificaciones sin leer</span>
           </Link>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={signOut}
+          aria-label="Cerrar sesión"
+        >
+          <LogOut className="size-5 text-muted-foreground hover:text-destructive" />
         </Button>
       </div>
     </header>

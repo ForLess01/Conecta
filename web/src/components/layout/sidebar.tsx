@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HelpCircle, Settings } from "lucide-react";
+import { HelpCircle, Settings, LogOut } from "lucide-react";
+import { toast } from "sonner";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { navForRole } from "./nav-items";
 import { useRole } from "./role-context";
@@ -16,10 +17,10 @@ export function Sidebar() {
 
   return (
     <aside className="hidden md:flex md:w-64 md:flex-col border-r border-border bg-card h-screen sticky top-0">
-      <div className="flex items-center gap-2 px-5 py-5">
+      <Link href="/home" className="flex items-center gap-2 px-5 py-5 hover:opacity-90 transition-opacity">
         <BrandLogo size={30} />
         <span className="font-heading text-lg font-semibold tracking-tight">Conecta</span>
-      </div>
+      </Link>
 
       <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
         {items.map((item) => {
@@ -45,19 +46,32 @@ export function Sidebar() {
 
       <div className="px-3 py-3 border-t border-border space-y-2">
         <RoleSwitcher />
-        <div className="flex items-center gap-1 px-1">
-          <Link
-            href="/settings"
-            className="flex flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted"
+        <div className="space-y-1">
+          <div className="flex items-center gap-1 px-1">
+            <Link
+              href="/settings"
+              className="flex flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted"
+            >
+              <Settings className="size-4" /> Configuración
+            </Link>
+            <Link
+              href="/notifications"
+              className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted"
+            >
+              <HelpCircle className="size-4" /> Ayuda
+            </Link>
+          </div>
+          <button
+            onClick={() => {
+              window.localStorage.removeItem("conecta.activeRole");
+              window.localStorage.removeItem("conecta.enabledRoles");
+              toast.success("Sesión cerrada.");
+              window.location.href = "/login";
+            }}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10 transition-colors text-left font-medium"
           >
-            <Settings className="size-4" /> Configuración
-          </Link>
-          <Link
-            href="/notifications"
-            className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted"
-          >
-            <HelpCircle className="size-4" /> Ayuda
-          </Link>
+            <LogOut className="size-4" /> Cerrar sesión
+          </button>
         </div>
       </div>
     </aside>

@@ -22,7 +22,7 @@ function DropdownMenuTrigger({
   // See components/ui/button.tsx for why this Radix-style `asChild` shim
   // exists on top of Base UI's `render` prop.
   if (asChild && React.isValidElement(children)) {
-    return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" render={children} {...props} />
+    return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" nativeButton={false} render={children} {...props} />
   }
   return (
     <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props}>

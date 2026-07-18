@@ -13,6 +13,7 @@ vi.mock("@/lib/server/negotiation/demo-private-pricing", () => ({
 }));
 
 import {
+  createSubmitQuickOfferRpcAdapter,
   QuickOfferServerConfigurationError,
   clearDemoQuickOfferAttempts,
   submitQuickOffer,
@@ -78,5 +79,28 @@ describe("quick-offer service boundaries", () => {
     await expect(submitQuickOffer(authenticatedCommand, adapter)).resolves.toMatchObject({
       status: "NOT_ACCEPTED",
     });
+  });
+
+  it("passes the authenticated buyer actor to the production RPC", async () => {
+    const rpc = vi.fn().mockResolvedValue({
+      result: "AUTO_ACCEPTED",
+      order_id: "order-uuid",
+      negotiation_id: "negotiation-uuid",
+      attempts_remaining: 2,
+      reservation_expires_at: "2026-07-18T17:00:00.000Z",
+    });
+    const adapter = createSubmitQuickOfferRpcAdapter(rpc);
+
+    const result = await adapter.submit({
+      ...command("ignored"),
+      buyerActorId: "buyer-uuid",
+      unitPrice: 2,
+    });
+
+    expect(rpc).toHaveBeenCalledWith("submit_quick_offer", expect.objectContaining({
+      p_buyer_actor_id: "buyer-uuid",
+      p_offer_listing_id: "prod-papa-canchan",
+    }));
+    expect(result).toMatchObject({ accepted: true, orderId: "order-uuid" });
   });
 });

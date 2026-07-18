@@ -12,27 +12,32 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Proposal } from "@/types/domain";
+
+interface ProposalDraft {
+  quantity: number;
+  unitPrice: number;
+  deliveryDate: string | null;
+  logisticsMode: "BUYER_PICKUP" | "PRODUCER_DELIVERY" | "MARKETPLACE_FREIGHT";
+}
 
 export function CreateProposalDialog({
   open,
   onOpenChange,
   defaults,
   onSubmit,
+  pending = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  defaults: Pick<Proposal, "quantity" | "unit" | "pricePerUnit" | "deliveryDate" | "qualityTerms" | "logisticsMode">;
-  onSubmit: (proposal: Omit<Proposal, "id" | "negotiationId" | "authorId" | "status">) => void;
+  defaults: ProposalDraft & { unit: string };
+  onSubmit: (proposal: ProposalDraft) => void | Promise<void>;
+  pending?: boolean;
 }) {
   const [quantity, setQuantity] = useState(defaults.quantity);
-  const [price, setPrice] = useState(defaults.pricePerUnit);
+  const [price, setPrice] = useState(defaults.unitPrice);
   const [deliveryDate, setDeliveryDate] = useState(defaults.deliveryDate);
-  const [qualityTerms, setQualityTerms] = useState(defaults.qualityTerms);
   const [logisticsMode, setLogisticsMode] = useState(defaults.logisticsMode);
-  const [notes, setNotes] = useState("");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -48,34 +53,60 @@ export function CreateProposalDialog({
             e.preventDefault();
             onSubmit({
               quantity,
-              unit: defaults.unit,
-              pricePerUnit: price,
-              deliveryDate,
-              qualityTerms,
+              unitPrice: price,
+              deliveryDate: deliveryDate || null,
               logisticsMode,
-              validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-              notes: notes || undefined,
             });
-            onOpenChange(false);
           }}
         >
-          <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-3">
             <div className="space-y-1.5">
               <Label htmlFor="quantity">Cantidad ({defaults.unit})</Label>
               <Input id="quantity" type="number" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} />
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <Label htmlFor="price">Precio por {defaults.unit}</Label>
-              <Input id="price" type="number" step="0.01" value={price} onChange={(e) => setPrice(Number(e.target.value))} />
+              <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950 text-white p-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-zinc-900 hover:text-white text-2xl font-light h-10 w-10 rounded-full select-none"
+                  onClick={() => setPrice((p) => Math.max(0.01, Number((p - 0.05).toFixed(2))))}
+                >
+                  −
+                </Button>
+
+                <div className="flex flex-col items-center flex-1">
+                  <div className="flex items-center justify-center">
+                    <span className="text-lg font-semibold mr-1 text-zinc-400">S/</span>
+                    <input
+                      id="price"
+                      type="number"
+                      step="0.01"
+                      value={price}
+                      onChange={(e) => setPrice(Number(e.target.value))}
+                      className="bg-transparent text-center border-none text-white text-2xl font-bold focus:ring-0 focus:outline-none w-20 p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                  <span className="text-xs text-zinc-400 mt-0.5 select-none">Precio Sugerido</span>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-zinc-900 hover:text-white text-2xl font-light h-10 w-10 rounded-full select-none"
+                  onClick={() => setPrice((p) => Number((p + 0.05).toFixed(2)))}
+                >
+                  +
+                </Button>
+              </div>
             </div>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="delivery">Fecha de entrega</Label>
-            <Input id="delivery" type="date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="quality">Términos de calidad</Label>
-            <Input id="quality" value={qualityTerms} onChange={(e) => setQualityTerms(e.target.value)} />
+            <Input id="delivery" type="date" value={deliveryDate ?? ""} onChange={(e) => setDeliveryDate(e.target.value)} />
           </div>
           <div className="space-y-1.5">
             <Label>Modalidad logística</Label>
@@ -84,21 +115,17 @@ export function CreateProposalDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Recoge el comprador">Recoge el comprador</SelectItem>
-                <SelectItem value="Entrega el productor">Entrega el productor</SelectItem>
-                <SelectItem value="Buscar transporte en marketplace">Buscar transporte en marketplace</SelectItem>
+                <SelectItem value="BUYER_PICKUP">Recoge el comprador</SelectItem>
+                <SelectItem value="PRODUCER_DELIVERY">Entrega el productor</SelectItem>
+                <SelectItem value="MARKETPLACE_FREIGHT">Buscar transporte en marketplace</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="notes">Observaciones</Label>
-            <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Condiciones de pago, empaque, etc." />
-          </div>
           <DialogFooter className="flex-row justify-end gap-2 pt-2">
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={pending}>
               Cancelar
             </Button>
-            <Button type="submit">Enviar propuesta</Button>
+            <Button type="submit" disabled={pending || quantity <= 0 || price <= 0}>{pending ? "Enviando..." : "Enviar propuesta"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

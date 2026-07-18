@@ -5,27 +5,24 @@ import { Button } from "@/components/ui/button";
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
+      <header className="sticky top-0 z-30 border-b border-border/80 bg-background/95 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
           <Link href="/" aria-label="Conecta, ir al inicio" className="flex items-center gap-2">
-            <BrandLogo size={30} />
-            <span className="font-heading text-lg font-semibold tracking-tight">Conecta</span>
+            <BrandLogo size={32} />
+            <span className="font-heading text-lg font-semibold tracking-[-0.02em]">Conecta</span>
           </Link>
-          <nav aria-label="Navegación pública" className="flex items-center gap-1 sm:gap-2">
-            <Button variant="ghost" asChild className="hidden sm:inline-flex">
-              <Link href="/">Inicio</Link>
+          <nav aria-label="Navegación pública" className="flex items-center gap-1 md:gap-2">
+            <Button variant="ghost" asChild className="hidden lg:inline-flex">
+              <Link href="/#como-funciona">Cómo funciona</Link>
             </Button>
             <Button variant="ghost" asChild className="hidden md:inline-flex">
-              <Link href="/plans">Planes</Link>
+              <Link href="/marketplace">Marketplace</Link>
             </Button>
             <Button variant="ghost" asChild className="hidden lg:inline-flex">
-              <Link href="/marketplace">Explorar marketplace</Link>
-            </Button>
-            <Button variant="ghost" asChild>
               <Link href="/login">Iniciar sesión</Link>
             </Button>
-            <Button asChild>
-              <Link href="/register">Registrarse</Link>
+            <Button asChild className="h-10 px-3 sm:px-4">
+              <Link href="/register">Crear cuenta</Link>
             </Button>
           </nav>
         </div>

@@ -1,35 +1,30 @@
-"use client";
-
 import Link from "next/link";
-import { toast } from "sonner";
 import { DesktopTopBar } from "@/components/layout/top-bar";
 import { StatCard } from "@/components/shared/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ADMIN_KPIS } from "@/lib/mock/admin";
-import { Users, ClipboardList, MessagesSquare, Truck, ShieldAlert, TrendingUp, FileWarning, RefreshCcw } from "lucide-react";
+import { getAdminMetrics } from "@/lib/server/admin/data";
+import { Users, ClipboardList, MessagesSquare, Truck, ShieldAlert, TrendingUp, FileWarning } from "lucide-react";
 
-export default function AdminDashboardPage() {
-  const totalUsers = Object.values(ADMIN_KPIS.usersByRole).reduce((a, b) => a + b, 0);
+export default async function AdminDashboardPage() {
+  const metrics = await getAdminMetrics();
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <DesktopTopBar title="Panel de administración" description="Resumen operativo de la plataforma." />
-        <Button className="gap-2" onClick={() => toast.success("Riesgos actualizados.")}>
-          <RefreshCcw className="size-4" /> Actualizar riesgos con IA
-        </Button>
+        <Button asChild><Link href="/admin/risk-events">Actualizar riesgos con IA</Link></Button>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Usuarios totales" value={String(totalUsers)} icon={Users} hint="Productor / comprador / transportista" />
-        <StatCard label="Publicaciones activas" value={String(ADMIN_KPIS.activeListings)} icon={ClipboardList} />
-        <StatCard label="Negociaciones en curso" value={String(ADMIN_KPIS.negotiationsInProgress)} icon={MessagesSquare} />
-        <StatCard label="Envíos activos" value={String(ADMIN_KPIS.activeShipments)} icon={Truck} />
-        <StatCard label="Eventos de riesgo vigentes" value={String(ADMIN_KPIS.activeRiskEvents)} icon={ShieldAlert} />
-        <StatCard label="Cobertura de precios" value={`${ADMIN_KPIS.priceCoveragePercent}%`} icon={TrendingUp} />
-        <StatCard label="Incidencias abiertas" value={String(ADMIN_KPIS.openIncidents)} icon={FileWarning} />
-        <StatCard label="Órdenes completadas" value={String(ADMIN_KPIS.ordersByStatus.completado)} icon={ClipboardList} />
+        <StatCard label="Usuarios totales" value={String(metrics.totalUsers)} icon={Users} hint="Cuentas registradas en Supabase" />
+        <StatCard label="Publicaciones activas" value={String(metrics.activeListings)} icon={ClipboardList} />
+        <StatCard label="Negociaciones en curso" value={String(metrics.negotiationsInProgress)} icon={MessagesSquare} />
+        <StatCard label="Envíos activos" value={String(metrics.activeShipments)} icon={Truck} />
+        <StatCard label="Eventos de riesgo vigentes" value={String(metrics.activeRiskEvents)} icon={ShieldAlert} />
+        <StatCard label="Cobertura de precios" value={`${metrics.priceCoveragePercent}%`} icon={TrendingUp} />
+        <StatCard label="Reportes abiertos" value={String(metrics.openIncidents)} icon={FileWarning} />
+        <StatCard label="Órdenes completadas" value={String(metrics.completedOrders)} icon={ClipboardList} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -1,84 +1,58 @@
-import Link from "next/link";
 import Image from "next/image";
-import { Bookmark } from "lucide-react";
-import type { Product } from "@/types/domain";
-import { PRODUCERS } from "@/lib/mock/actors";
-import { CategoryIcon } from "@/components/brand/category-icons";
-import { RiskBadge } from "./risk-badge";
-import { ConfidenceBadge, FreshnessBadge } from "./confidence-badge";
-import { PriceSuggestionBadge } from "./price-suggestion-badge";
-import { NegotiationModeBadge } from "./negotiation-mode-badge";
-import { VerificationBadge, LocationBadge, QuantityBadge } from "./misc-badges";
-import { formatQuantity } from "@/lib/format";
+import Link from "next/link";
+import { PackageOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { LocationBadge, QuantityBadge } from "./misc-badges";
+import { SaveListingButton } from "./save-listing-button";
+import type { MarketplaceListing } from "@/lib/server/marketplace/types";
 
-export function ProductCard({ product }: { product: Product }) {
-  const producer = PRODUCERS.find((p) => p.id === product.producerId);
-
+export function ProductCard({
+  listing,
+  canSave = true,
+  imageSrc,
+}: {
+  listing: MarketplaceListing;
+  canSave?: boolean;
+  imageSrc?: string;
+}) {
   return (
-    <div className="group flex flex-col rounded-2xl border border-border bg-card overflow-hidden transition-shadow hover:shadow-md">
-      <div className="relative h-36 overflow-hidden bg-secondary">
-        {product.photos[0] ? (
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-shadow hover:shadow-md">
+      <div className="relative flex h-40 items-center justify-center overflow-hidden bg-secondary/70 text-primary">
+        {imageSrc ? (
           <Image
-            src={product.photos[0]}
-            alt={`${product.name} — ${product.variety}, ${product.location.district}`}
+            src={imageSrc}
+            alt={`${listing.productName}${listing.varietyName ? `, ${listing.varietyName}` : ""}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none"
           />
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <CategoryIcon category={product.category} size={40} className="text-primary" />
-          </div>
+          <PackageOpen className="size-12" aria-hidden="true" />
         )}
-        <span className="absolute bottom-2 left-2 flex size-7 items-center justify-center rounded-full bg-card/90 text-primary shadow-sm backdrop-blur">
-          <CategoryIcon category={product.category} size={16} />
-        </span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 size-8 bg-card/80 backdrop-blur hover:bg-card"
-          aria-label="Guardar producto"
-        >
-          <Bookmark className="size-4" />
-        </Button>
+        {imageSrc && <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />}
+        <Badge className="absolute left-3 top-3" variant="secondary">Oferta</Badge>
+        {canSave && <SaveListingButton listingId={listing.id} initialSaved={listing.saved} />}
       </div>
-
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="font-heading text-sm font-semibold leading-tight">{product.name}</p>
-            <p className="text-xs text-muted-foreground">{product.variety}</p>
-          </div>
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div>
+          <h2 className="font-heading text-sm font-semibold leading-tight">{listing.title}</h2>
+          <p className="text-xs text-muted-foreground">{listing.productName}{listing.varietyName ? ` · ${listing.varietyName}` : ""}</p>
         </div>
-
         <div className="flex flex-wrap items-center gap-2">
-          <LocationBadge label={`${product.location.district}, ${product.location.region}`} />
-          <QuantityBadge label={formatQuantity(product.quantityAvailable, product.unit)} />
+          <LocationBadge label={listing.locationLabel} />
+          <QuantityBadge label={`${listing.quantity.toLocaleString("es-PE")} ${listing.unitSymbol}`} />
         </div>
-
-        <PriceSuggestionBadge range={product.priceRange} compact />
-
-        <div className="flex flex-wrap items-center gap-1.5 pt-1">
-          <NegotiationModeBadge mode={product.negotiationMode} />
-          <RiskBadge level={product.risk.level} score={product.risk.score} />
+        {listing.description && <p className="line-clamp-2 text-xs text-muted-foreground">{listing.description}</p>}
+        <div className="mt-auto border-t border-border pt-3">
+          <Link href={`/profiles/${listing.actorId}`} className="text-xs font-medium hover:text-primary hover:underline">
+            {listing.actorName}
+          </Link>
         </div>
-        <div className="flex items-center gap-2">
-          <ConfidenceBadge confidence={product.risk.confidence} />
-          <FreshnessBadge updatedAt={product.risk.updatedAt} />
-        </div>
-
-        <div className="mt-1 flex items-center justify-between border-t border-border pt-2">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-xs font-medium truncate">{producer?.name}</span>
-            {producer && <VerificationBadge level={producer.verification} />}
-          </div>
-        </div>
-
-        <Button asChild className="mt-1 w-full">
-          <Link href={`/marketplace/offers/${product.id}`}>Abrir producto</Link>
+        <Button asChild className="w-full">
+          <Link href={`/marketplace/offers/${listing.id}`}>Abrir producto</Link>
         </Button>
       </div>
-    </div>
+    </article>
   );
 }

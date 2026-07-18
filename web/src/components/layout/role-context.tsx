@@ -2,8 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { UserRole } from "@/types/domain";
-import { SESSION_BY_ROLE } from "@/lib/mock/session";
 import { isSelfServiceRole, sanitizeSelfServiceRoles, type SelfServiceRole } from "@/lib/roles";
+import type { ActorContext } from "@/lib/supabase/session";
 
 const STORAGE_KEY = "conecta.activeRole";
 const ROLES_KEY = "conecta.enabledRoles";
@@ -19,9 +19,13 @@ interface RoleContextValue {
 
 const RoleContext = createContext<RoleContextValue | null>(null);
 
-export function RoleProvider({ children }: { children: React.ReactNode }) {
-  const [activeRole, setActiveRoleState] = useState<UserRole>(DEFAULT_ROLE);
-  const [enabledRoles, setEnabledRoles] = useState<UserRole[]>(["productor", "comprador"]);
+export function RoleProvider({ children, initialActor }: { children: React.ReactNode; initialActor: ActorContext }) {
+  const authorizedRoles = useMemo(
+    () => initialActor.roles.length ? initialActor.roles : [DEFAULT_ROLE],
+    [initialActor.roles],
+  );
+  const [activeRole, setActiveRoleState] = useState<UserRole>(authorizedRoles[0]);
+  const enabledRoles: UserRole[] = authorizedRoles;
 
   useEffect(() => {
     // One-time hydration of persisted role state from localStorage.
@@ -30,11 +34,12 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     // exception to "don't setState in an effect".
     const storedRole = window.localStorage.getItem(STORAGE_KEY);
     const storedRoles = window.localStorage.getItem(ROLES_KEY);
-    let safeRoles: SelfServiceRole[] = ["productor", "comprador"];
+    let safeRoles: UserRole[] = authorizedRoles;
     if (storedRoles) {
       try {
         const parsed = sanitizeSelfServiceRoles(JSON.parse(storedRoles));
-        if (parsed.length) safeRoles = parsed;
+        const persistedAuthorizedRoles = parsed.filter((role) => authorizedRoles.includes(role));
+        if (persistedAuthorizedRoles.length) safeRoles = persistedAuthorizedRoles;
       } catch {
         // ignore malformed value
       }
@@ -44,10 +49,9 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       : safeRoles[0] ?? DEFAULT_ROLE;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from localStorage on mount
     setActiveRoleState(safeActiveRole);
-    setEnabledRoles(safeRoles);
     window.localStorage.setItem(STORAGE_KEY, safeActiveRole);
-    window.localStorage.setItem(ROLES_KEY, JSON.stringify(safeRoles));
-  }, []);
+    window.localStorage.setItem(ROLES_KEY, JSON.stringify(authorizedRoles));
+  }, [authorizedRoles]);
 
   const setActiveRole = useCallback((role: UserRole) => {
     if (!isSelfServiceRole(role) || !enabledRoles.includes(role)) return;
@@ -56,16 +60,14 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   }, [enabledRoles]);
 
   const toggleRole = useCallback((role: UserRole) => {
-    if (!isSelfServiceRole(role)) return;
-    setEnabledRoles((prev) => {
-      if (prev.includes(role) && (role === activeRole || prev.length === 1)) return prev;
-      const next = prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role];
-      window.localStorage.setItem(ROLES_KEY, JSON.stringify(next));
-      return next;
-    });
-  }, [activeRole]);
+    if (!isSelfServiceRole(role) || !authorizedRoles.includes(role)) return;
+  }, [authorizedRoles]);
 
-  const currentActor = useMemo(() => SESSION_BY_ROLE[activeRole], [activeRole]);
+  const currentActor = useMemo(() => ({
+    id: initialActor.id,
+    name: initialActor.name,
+    avatarSeed: initialActor.id,
+  }), [initialActor.id, initialActor.name]);
 
   const value = useMemo(
     () => ({ activeRole, setActiveRole, enabledRoles, toggleRole, currentActor }),

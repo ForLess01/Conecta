@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Stepper } from "@/components/shared/stepper";
@@ -12,12 +12,24 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { completeOnboardingAction } from "../actions";
 
 const STEPS = ["Identidad", "Operación", "Vehículo", "Capacidad", "Rutas", "Documentos", "Retorno"];
 
 export default function TransporterOnboardingPage() {
   const [step, setStep] = useState(0);
   const [operationType, setOperationType] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [vehicleType, setVehicleType] = useState("camion_8t");
+  const [plate, setPlate] = useState("");
+  const [bodyType, setBodyType] = useState("baranda");
+  const [capacityKg, setCapacityKg] = useState("");
+  const [capacityM3, setCapacityM3] = useState("");
+  const [routes, setRoutes] = useState<string[]>([]);
+  const [documents, setDocuments] = useState<string[]>([]);
+  const [returnAvailable, setReturnAvailable] = useState(true);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const isLast = step === STEPS.length - 1;
 
@@ -35,11 +47,11 @@ export default function TransporterOnboardingPage() {
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="name">Nombre completo</Label>
-                <Input id="name" placeholder="Nombre y apellidos" />
+                 <Input id="name" placeholder="Nombre y apellidos" value={name} onChange={(event) => setName(event.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="phone">Teléfono</Label>
-                <Input id="phone" placeholder="9XX XXX XXX" />
+                 <Input id="phone" placeholder="9XX XXX XXX" value={phone} onChange={(event) => setPhone(event.target.value)} />
               </div>
             </div>
           )}
@@ -66,7 +78,7 @@ export default function TransporterOnboardingPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label>Tipo de vehículo</Label>
-                <Select defaultValue="camion_8t">
+                 <Select value={vehicleType} onValueChange={(value) => value && setVehicleType(value)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -82,11 +94,11 @@ export default function TransporterOnboardingPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="plate">Placa</Label>
-                <Input id="plate" placeholder="XXX-000" />
+                 <Input id="plate" placeholder="XXX-000" value={plate} onChange={(event) => setPlate(event.target.value)} />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label>Carrocería</Label>
-                <Select defaultValue="baranda">
+                 <Select value={bodyType} onValueChange={(value) => value && setBodyType(value)}>
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -105,11 +117,11 @@ export default function TransporterOnboardingPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="kg">Capacidad (kg)</Label>
-                <Input id="kg" type="number" placeholder="8000" />
+                 <Input id="kg" type="number" placeholder="8000" value={capacityKg} onChange={(event) => setCapacityKg(event.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="m3">Capacidad (m3)</Label>
-                <Input id="m3" type="number" placeholder="22" />
+                 <Input id="m3" type="number" placeholder="22" value={capacityM3} onChange={(event) => setCapacityM3(event.target.value)} />
               </div>
             </div>
           )}
@@ -119,7 +131,7 @@ export default function TransporterOnboardingPage() {
               <Label>Rutas frecuentes</Label>
               {["Ilave - Juliaca", "Acora - Puno", "Puno - Arequipa", "Juli - Puno"].map((route) => (
                 <label key={route} className="flex items-center gap-2 rounded-xl border border-border px-3 py-2.5 text-sm">
-                  <Checkbox /> {route}
+                   <Checkbox checked={routes.includes(route)} onCheckedChange={() => setRoutes((current) => current.includes(route) ? current.filter((item) => item !== route) : [...current, route])} /> {route}
                 </label>
               ))}
             </div>
@@ -130,7 +142,7 @@ export default function TransporterOnboardingPage() {
               <p className="text-sm text-muted-foreground">Declara tus documentos. Los verificaremos para subir tu nivel de confianza.</p>
               {["Licencia de conducir", "SOAT vigente", "Revisión técnica", "Tarjeta de propiedad"].map((doc) => (
                 <label key={doc} className="flex items-center gap-2 rounded-xl border border-border px-3 py-2.5 text-sm">
-                  <Checkbox /> {doc}
+                   <Checkbox checked={documents.includes(doc)} onCheckedChange={() => setDocuments((current) => current.includes(doc) ? current.filter((item) => item !== doc) : [...current, doc])} /> {doc}
                 </label>
               ))}
             </div>
@@ -142,7 +154,7 @@ export default function TransporterOnboardingPage() {
                 <p className="text-sm font-medium">Disponible para carga de retorno</p>
                 <p className="text-xs text-muted-foreground">Recibe sugerencias de carga para tu viaje de vuelta y evita retornar vacío.</p>
               </div>
-              <Switch defaultChecked />
+               <Switch checked={returnAvailable} onCheckedChange={setReturnAvailable} />
             </div>
           )}
         </CardContent>
@@ -153,20 +165,27 @@ export default function TransporterOnboardingPage() {
           <Button variant="ghost" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
             Atrás
           </Button>
-          {step === 2 && (
-            <Button variant="outline" onClick={() => toast.info("Podrás agregar más vehículos desde tu flota.")}>
-              Agregar otro vehículo
-            </Button>
-          )}
         </div>
         {isLast ? (
           <Button
-            onClick={() => {
-              toast.success("Perfil de transportista configurado.");
-              router.push("/verification");
-            }}
+             disabled={isPending}
+             onClick={() => startTransition(async () => {
+               try {
+                 const vehicleTypeCode = ({ pickup: "PICKUP", camioneta_4x4: "PICKUP", camion_ligero: "LIGHT_TRUCK", camion_8t: "MEDIUM_TRUCK", camion_12t: "HEAVY_TRUCK", furgon_cubierto: "VAN" } as const)[vehicleType as "pickup" | "camioneta_4x4" | "camion_ligero" | "camion_8t" | "camion_12t" | "furgon_cubierto"];
+                  const bodyTypeCode = ({ baranda: "OPEN", furgon: "COVERED", refrigerado: "REFRIGERATED", plataforma: "OPEN" } as const)[bodyType as "baranda" | "furgon" | "refrigerado" | "plataforma"];
+                 await completeOnboardingAction({
+                   role: "transportista", name, phone,
+                   details: { operationType, routes, declaredDocuments: documents, returnAvailable },
+                   vehicle: plate ? { plate, vehicleTypeCode, bodyTypeCode, capacityKg: Number(capacityKg), capacityM3, covered: bodyType !== "plataforma", refrigerated: bodyType === "refrigerado", fourWheelDrive: vehicleType === "camioneta_4x4" } : null,
+                 });
+                 toast.success("Perfil de transportista configurado.");
+                 router.push("/verification");
+               } catch (error) {
+                 toast.error(error instanceof Error ? error.message : "No se pudo guardar el perfil.");
+               }
+             })}
           >
-            Finalizar
+             {isPending ? "Guardando..." : "Finalizar"}
           </Button>
         ) : (
           <Button onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}>Siguiente</Button>

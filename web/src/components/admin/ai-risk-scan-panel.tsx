@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { AlertTriangle, ExternalLink, KeyRound, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { AlertTriangle, ExternalLink, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { RiskCandidate } from "@/lib/ai/schemas";
 
@@ -55,15 +55,13 @@ const SOURCE_LABEL: Record<RiskAnalysisResponse["source"], string> = {
   mixed: "Gemini y datos de respaldo",
 };
 
-export function AiRiskScanPanel() {
-  const [candidates, setCandidates] = useState<RiskCandidate[]>([]);
+export function AiRiskScanPanel({ initialCandidates = [] }: { initialCandidates?: RiskCandidate[] }) {
+  const router = useRouter();
+  const [candidates, setCandidates] = useState<RiskCandidate[]>(initialCandidates);
   const [analysis, setAnalysis] = useState<RiskAnalysisResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [adminSessionRequired, setAdminSessionRequired] = useState(false);
-  const [adminPassphrase, setAdminPassphrase] = useState("");
-  const [adminAuthError, setAdminAuthError] = useState<string | null>(null);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [pendingCandidateId, setPendingCandidateId] = useState<string | null>(null);
 
   async function analyzeRisks() {
     setIsLoading(true);
@@ -82,19 +80,12 @@ export function AiRiskScanPanel() {
         }),
       });
 
-      if (response.status === 401) {
-        setAdminSessionRequired(true);
-        setAdminAuthError(null);
-        return;
-      }
-
       if (!response.ok) {
-        throw new Error("No se pudo completar el análisis. Intentá nuevamente.");
+        throw new Error(response.status === 403 ? "Tu cuenta no tiene el rol ADMIN en Supabase." : "No se pudo completar el análisis. Intentá nuevamente.");
       }
 
       const result = (await response.json()) as RiskAnalysisResponse;
 
-      setAdminSessionRequired(false);
       setAnalysis(result);
       setCandidates((current) => {
         const merged = new Map(current.map((candidate) => [candidate.id, candidate]));
@@ -108,35 +99,21 @@ export function AiRiskScanPanel() {
     }
   }
 
-  async function establishAdminSession(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsAuthenticating(true);
-    setAdminAuthError(null);
-
+  async function reviewCandidate(id: string, action: "confirm" | "discard") {
+    setPendingCandidateId(id);
     try {
-      const response = await fetch("/api/admin/session", {
-        method: "POST",
-        cache: "no-store",
+      const response = await fetch(`/api/risk/candidates/${id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passphrase: adminPassphrase }),
+        body: JSON.stringify({ action }),
       });
-
-      if (!response.ok) {
-        setAdminAuthError(
-          response.status === 503
-            ? "La autenticación administrativa no está configurada en el servidor."
-            : "La contraseña no es válida. Verificála e intentá nuevamente.",
-        );
-        return;
-      }
-
-      setAdminPassphrase("");
-      setAdminSessionRequired(false);
-      await analyzeRisks();
-    } catch {
-      setAdminAuthError("No se pudo iniciar la sesión administrativa. Intentá nuevamente.");
+      if (!response.ok) throw new Error("No se pudo revisar el candidato.");
+      setCandidates((current) => current.filter((candidate) => candidate.id !== id));
+      router.refresh();
+    } catch (reviewError) {
+      setError(reviewError instanceof Error ? reviewError.message : "No se pudo revisar el candidato.");
     } finally {
-      setIsAuthenticating(false);
+      setPendingCandidateId(null);
     }
   }
 
@@ -151,10 +128,10 @@ export function AiRiskScanPanel() {
             </CardTitle>
             <CardDescription className="max-w-2xl">
               Busca señales públicas de las últimas 72 horas en seis corredores permitidos de Puno.
-              Los resultados son candidatos temporales y no se guardan automáticamente.
+              Cada ejecución, candidato y cita se guarda para revisión y auditoría.
             </CardDescription>
           </div>
-          <Button onClick={analyzeRisks} disabled={isLoading || isAuthenticating} className="shrink-0">
+          <Button onClick={analyzeRisks} disabled={isLoading} className="shrink-0">
             {isLoading ? (
               <Loader2 className="animate-spin" aria-hidden="true" />
             ) : (
@@ -163,49 +140,6 @@ export function AiRiskScanPanel() {
             {isLoading ? "Analizando riesgos…" : "Actualizar riesgos con Gemini"}
           </Button>
         </CardHeader>
-
-        {adminSessionRequired ? (
-          <CardContent className="border-t border-border pt-5">
-            <form onSubmit={establishAdminSession} className="max-w-md space-y-3">
-              <div className="space-y-1.5">
-                <label htmlFor="admin-risk-passphrase" className="text-sm font-medium">
-                  Contraseña de administrador
-                </label>
-                <Input
-                  id="admin-risk-passphrase"
-                  name="admin-passphrase"
-                  type="password"
-                  value={adminPassphrase}
-                  onChange={(event) => setAdminPassphrase(event.target.value)}
-                  autoComplete="current-password"
-                  spellCheck={false}
-                  placeholder="Ingresá la contraseña…"
-                  aria-invalid={Boolean(adminAuthError)}
-                  aria-describedby={adminAuthError ? "admin-risk-auth-error" : "admin-risk-auth-help"}
-                  disabled={isAuthenticating}
-                  required
-                />
-                {adminAuthError ? (
-                  <p id="admin-risk-auth-error" className="text-sm text-destructive" role="alert">
-                    {adminAuthError}
-                  </p>
-                ) : (
-                  <p id="admin-risk-auth-help" className="text-xs text-muted-foreground">
-                    La contraseña se envía solo para crear una sesión segura y no se guarda en el navegador.
-                  </p>
-                )}
-              </div>
-              <Button type="submit" disabled={isAuthenticating || !adminPassphrase}>
-                {isAuthenticating ? (
-                  <Loader2 className="animate-spin" aria-hidden="true" />
-                ) : (
-                  <KeyRound aria-hidden="true" />
-                )}
-                {isAuthenticating ? "Iniciando sesión…" : "Iniciar sesión y analizar"}
-              </Button>
-            </form>
-          </CardContent>
-        ) : null}
 
         {(analysis || error) && (
           <CardContent className="space-y-4 border-t border-border pt-5">
@@ -246,7 +180,7 @@ export function AiRiskScanPanel() {
                 UNCONFIRMED · Requieren revisión y confirmación humana antes de convertirse en eventos.
               </p>
             </div>
-            <Badge variant="outline">{candidates.length} temporales</Badge>
+            <Badge variant="outline">{candidates.length} pendientes</Badge>
           </div>
 
           {candidates.length === 0 ? (
@@ -266,7 +200,7 @@ export function AiRiskScanPanel() {
                     <TableHead>Severidad</TableHead>
                     <TableHead>Confianza</TableHead>
                     <TableHead>Citas</TableHead>
-                    <TableHead>Estado</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -303,8 +237,9 @@ export function AiRiskScanPanel() {
                           ))}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">UNCONFIRMED</Badge>
+                      <TableCell className="space-x-1 text-right">
+                        <Button size="sm" disabled={pendingCandidateId === candidate.id} onClick={() => reviewCandidate(candidate.id, "confirm")}>Confirmar</Button>
+                        <Button size="sm" variant="ghost" disabled={pendingCandidateId === candidate.id} onClick={() => reviewCandidate(candidate.id, "discard")}>Descartar</Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -313,9 +248,7 @@ export function AiRiskScanPanel() {
             </div>
           )}
 
-          <p className="text-xs text-muted-foreground">
-            Esta lista vive solo en la sesión actual del navegador. Confirmar un candidato requiere el flujo del backend.
-          </p>
+          <p className="text-xs text-muted-foreground">Los candidatos, citas y decisiones quedan registrados para auditoría.</p>
         </div>
       )}
     </section>

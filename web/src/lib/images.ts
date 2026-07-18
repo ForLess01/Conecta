@@ -11,7 +11,7 @@ export const IMAGES = {
   papaCanchan: "/images/papa-canchan.jpg",
   papaImilla: "/images/papa-imilla.jpg",
   papaDetail: "/images/papa-detail.jpg",
-  alpaca: "/images/alpaca.jpg",
+  alpaca: "/images/alpaca-field.jpg",
   alpacaField: "/images/alpaca-field.jpg",
   alpacaCloseup: "/images/alpaca-closeup.jpg",
   quinuaSacks: "/images/quinua-sacks.jpg",

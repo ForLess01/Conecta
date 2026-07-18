@@ -1,140 +1,35 @@
-"use client";
-
-import { use } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { toast } from "sonner";
-import { getTripById, getFreightById } from "@/lib/mock/logistics";
-import { VEHICLES } from "@/lib/mock/actors";
+import { AlertTriangle, Check, Circle } from "lucide-react";
 import { DesktopTopBar } from "@/components/layout/top-bar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TripRouteMap } from "@/components/maps/trip-route-map";
-import { RiskBadge } from "@/components/marketplace/risk-badge";
 import { formatDateTime } from "@/lib/format";
-import { VEHICLE_LABELS } from "@/lib/mock/vehicle-labels";
-import { Check, Circle, Phone } from "lucide-react";
-import { useRole } from "@/components/layout/role-context";
+import { getTrip } from "@/lib/server/trips";
+import { getMyActorContext } from "@/lib/supabase/session";
+import { transitionTripAction } from "./actions";
 
-const STATUS_LABEL: Record<string, string> = {
-  programado: "Programado",
-  recojo: "Recojo",
-  en_transito: "En tránsito",
-  demorado: "Demorado",
-  entregado: "Entregado",
-};
+const LABEL: Record<string, string> = { SCHEDULED: "Programado", PICKED_UP: "Recogido", IN_TRANSIT: "En tránsito", DELAYED: "Demorado", DELIVERED: "Entregado", CANCELLED: "Cancelado" };
+const NEXT: Record<string, { status: string; label: string }[]> = { PICKED_UP: [{ status: "IN_TRANSIT", label: "Iniciar ruta" }], IN_TRANSIT: [{ status: "DELAYED", label: "Marcar demora" }], DELAYED: [{ status: "IN_TRANSIT", label: "Reanudar ruta" }] };
 
-export default function TripTrackingPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-  const trip = getTripById(id);
-  const { activeRole } = useRole();
-
-  if (!trip) notFound();
-
-  const freight = getFreightById(trip.freightRequestId);
-  const vehicle = VEHICLES.find((v) => v.id === trip.vehicleId);
-
-  return (
-    <div className="space-y-6">
-      <DesktopTopBar title="Seguimiento del viaje" description={trip.cargoDescription} />
-
-      <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-        <div className="space-y-4">
-          {activeRole === "transportista" && freight ? (
-            <TripRouteMap
-              origin={freight.origin}
-              destination={freight.destination}
-              distanceKm={freight.distanceKm}
-              stops={trip.stops.map((stop) => stop.label)}
-            />
-          ) : freight ? (
-            <Card>
-              <CardContent className="grid gap-4 pt-6 sm:grid-cols-3">
-                <div><p className="text-xs text-muted-foreground">Origen</p><p className="text-sm font-medium">{freight.origin.district}</p></div>
-                <div><p className="text-xs text-muted-foreground">Destino</p><p className="text-sm font-medium">{freight.destination.district}</p></div>
-                <div><p className="text-xs text-muted-foreground">Estado de entrega</p><p className="text-sm font-medium">{STATUS_LABEL[trip.status]}</p></div>
-              </CardContent>
-            </Card>
-          ) : null}
-
-          <Card>
-            <CardContent className="space-y-4 pt-6">
-              <div className="flex items-center justify-between">
-                <h3 className="font-heading text-base font-semibold">Línea de tiempo</h3>
-                <Badge>{STATUS_LABEL[trip.status]}</Badge>
-              </div>
-              <ol className="space-y-3">
-                {trip.timeline.map((event) => (
-                  <li key={event.at} className="flex items-start gap-3">
-                    <Check className="mt-0.5 size-4 text-primary" />
-                    <div>
-                      <p className="text-sm font-medium">{event.label}</p>
-                      <p className="text-xs text-muted-foreground">{formatDateTime(event.at)}</p>
-                    </div>
-                  </li>
-                ))}
-                <li className="flex items-start gap-3 text-muted-foreground">
-                  <Circle className="mt-0.5 size-4" />
-                  <p className="text-sm">Entregado</p>
-                </li>
-              </ol>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="space-y-2 pt-6">
-              <h3 className="font-heading text-base font-semibold">Paradas</h3>
-              {trip.stops.map((stop) => (
-                <div key={stop.label} className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2 text-sm">
-                  <span className={stop.done ? "" : "text-muted-foreground"}>{stop.label}</span>
-                  {stop.done ? <Check className="size-4 text-primary" /> : <Circle className="size-4 text-muted-foreground" />}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-4">
-          <Card>
-            <CardContent className="space-y-3 pt-6">
-              <p className="text-xs font-medium text-muted-foreground">Conductor y vehículo</p>
-              <p className="text-sm font-medium">{trip.driverName}</p>
-              <p className="text-xs text-muted-foreground">
-                {vehicle ? `${VEHICLE_LABELS[vehicle.type]} · ${vehicle.plate}` : "—"}
-              </p>
-              <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => toast.info("Llamando al conductor.")}>
-                <Phone className="size-4" /> Contactar conductor
-              </Button>
-            </CardContent>
-          </Card>
-
-          {freight && (
-            <Card>
-              <CardContent className="space-y-2 pt-6">
-                <p className="text-xs font-medium text-muted-foreground">Riesgo activo en la ruta</p>
-                <RiskBadge level={freight.risk.level} score={freight.risk.score} />
-                <p className="text-xs text-muted-foreground">{freight.risk.reason}</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {activeRole === "transportista" && (
-            <Card>
-              <CardContent className="space-y-2 pt-6">
-                <Button className="w-full" onClick={() => toast.success("Estado actualizado.")}>
-                  Actualizar estado
-                </Button>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" size="sm" asChild><Link href={`/trips/${trip.id}/pickup`}>Registrar recojo</Link></Button>
-                  <Button variant="outline" size="sm" asChild><Link href={`/trips/${trip.id}/delivery`}>Registrar entrega</Link></Button>
-                </div>
-                <Button variant="ghost" size="sm" asChild className="w-full"><Link href={`/trips/${trip.id}/incident`}>Reportar incidencia</Link></Button>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+export default async function TripTrackingPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; const [{ trip, history, records, incidents, evidence }, actor] = await Promise.all([getTrip(id), getMyActorContext()]); if (!trip) notFound();
+  const shipment = trip.shipment_assignments?.shipment_requests; const bid = trip.shipment_assignments?.freight_bids;
+  const managesTrip = actor?.id === bid?.transporter_actor_id;
+  return <div className="space-y-6"><DesktopTopBar title="Seguimiento del viaje" description={shipment?.cargo_description ?? `Viaje ${id.slice(0, 8)}`} />
+    <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]"><div className="space-y-4">
+      {shipment?.origin_label && shipment.destination_label && <TripRouteMap origin={shipment.origin_label} destination={shipment.destination_label} />}
+      <Card><CardContent className="space-y-4 pt-6"><div className="flex justify-between"><h2 className="font-heading font-semibold">Línea de tiempo</h2><Badge>{LABEL[trip.status]}</Badge></div><ol className="space-y-3">{history.map((event) => <li key={event.id} className="flex gap-3"><Check className="mt-0.5 size-4 text-primary" /><div><p className="text-sm font-medium">{LABEL[event.status] ?? event.status}</p><p className="text-xs text-muted-foreground">{formatDateTime(event.created_at)}{event.notes ? ` · ${event.notes}` : ""}</p></div></li>)}{trip.status !== "DELIVERED" && <li className="flex gap-3 text-muted-foreground"><Circle className="size-4" /> Entregado</li>}</ol></CardContent></Card>
+      {(records.length > 0 || evidence.length > 0) && <Card><CardContent className="space-y-3 pt-6"><h2 className="font-heading font-semibold">Registros y evidencia</h2>{records.map((record) => <p key={record.id} className="rounded-xl bg-muted p-3 text-sm"><strong>{record.record_type === "PICKUP" ? "Recojo" : "Entrega"}</strong> · {record.recorded_weight_kg} kg · {formatDateTime(record.recorded_at)}</p>)}{evidence.map((item) => <p key={item.id} className="text-sm text-muted-foreground">Archivo: {item.original_filename ?? item.evidence_type} · {formatDateTime(item.captured_at)}</p>)}</CardContent></Card>}
+      {incidents.length > 0 && <Card><CardContent className="space-y-3 pt-6"><h2 className="flex items-center gap-2 font-heading font-semibold"><AlertTriangle className="size-4 text-destructive" /> Incidencias</h2>{incidents.map((incident) => <div key={incident.id} className="rounded-xl border p-3"><p className="text-sm font-medium">{incident.incident_type}</p><p className="text-sm text-muted-foreground">{incident.description}</p></div>)}</CardContent></Card>}
+    </div><div className="space-y-4"><Card><CardContent className="space-y-3 pt-6"><p className="text-xs text-muted-foreground">Conductor y vehículo</p><p className="font-medium">{bid?.actors?.display_name ?? "Transportista"}</p><p className="text-sm text-muted-foreground">{bid?.vehicles?.display_name ?? "Vehículo"} · {bid?.vehicles?.plate ?? "Sin placa"}</p></CardContent></Card>
+      {managesTrip && <Card><CardContent className="space-y-2 pt-6">{(NEXT[trip.status] ?? []).map((next) => <form action={transitionTripAction} key={next.status}><input type="hidden" name="tripId" value={trip.id} /><input type="hidden" name="status" value={next.status} /><Button className="w-full">{next.label}</Button></form>)}
+        {trip.status === "SCHEDULED" && <Button variant="outline" asChild className="w-full"><Link href={`/trips/${trip.id}/pickup`}>Registrar recojo</Link></Button>}
+        {["IN_TRANSIT", "DELAYED"].includes(trip.status) && <Button variant="outline" asChild className="w-full"><Link href={`/trips/${trip.id}/delivery`}>Registrar entrega</Link></Button>}
+        {!['DELIVERED','CANCELLED'].includes(trip.status) && <Button variant="ghost" asChild className="w-full"><Link href={`/trips/${trip.id}/incident`}>Reportar incidencia</Link></Button>}
+      </CardContent></Card>}
+    </div></div>
+  </div>;
 }
