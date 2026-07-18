@@ -1,0 +1,20 @@
+﻿{
+  "targetColumn": "target_price_next_7_days",
+  "secondaryTargetColumn": "target_price_next_day",
+  "dateColumn": "date",
+  "groupColumns": [
+    "product",
+    "variety",
+    "origin_department",
+    "origin_province",
+    "market"
+  ],
+  "testFraction": 0.2,
+  "validationFraction": 0.15,
+  "randomSeed": 42,
+  "minimumTrainingRowsPerProduct": 250,
+  "modelStrategy": "compare_global_and_per_product",
+  "selectionMetric": "MAE",
+  "predictionIntervalConfidence": 0.9,
+  "directionalTolerance": 0.01
+}

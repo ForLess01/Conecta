@@ -1,0 +1,27 @@
+{
+  "modelVersion": "1.0.0",
+  "target": "target_price_next_7_days",
+  "trainedAt": "2026-07-18T20:36:00.269874+00:00",
+  "products": {
+    "Granada|Wonderful": {
+      "strategy": "global",
+      "artifactPath": "models/global/model.joblib"
+    },
+    "Palta|Hass": {
+      "strategy": "individual",
+      "artifactPath": "models/by_product/palta_hass/model.joblib"
+    },
+    "Papa|Yungay": {
+      "strategy": "individual",
+      "artifactPath": "models/by_product/papa_yungay/model.joblib"
+    },
+    "Pimiento|Paprika": {
+      "strategy": "individual",
+      "artifactPath": "models/by_product/pimiento_paprika/model.joblib"
+    },
+    "Quinua|Blanca De Junin": {
+      "strategy": "global",
+      "artifactPath": "models/global/model.joblib"
+    }
+  }
+}

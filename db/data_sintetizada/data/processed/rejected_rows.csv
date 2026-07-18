@@ -1,0 +1,53 @@
+source_file,stage,reason,row_date,row_product,row_variety,row_origin_department,row_origin_province,row_market,row_market_city,row_min_price_per_kg,row_avg_price_per_kg,row_max_price_per_kg,row_volume_kg,row_source,row_is_synthetic,row_generated_at,row_department,row_province,row_district,row_latitude,row_longitude,row_temp_min_c,row_temp_max_c,row_temp_avg_c,row_precipitation_mm,row_humidity_avg,row_wind_speed_kmh,row_is_outlier
+market_prices,date_validation,invalid_date,not_a_date,Papa,Yungay,Junin,Huancayo,Gran Mercado Mayorista De Lima,Lima,2.42,2.65,2.88,45750.66,SYNTHETIC_GENERATOR,True,2026-06-30T00:00:00Z,,,,,,,,,,,,
+market_prices,date_validation,invalid_date,2026-02-30,Quinua,Blanca De Junin,Puno,Puno,Gran Mercado Mayorista De Lima,Lima,4.38,4.71,5.11,7101.29,SYNTHETIC_GENERATOR,True,2026-06-30T00:00:00Z,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-03-14,Granada,Wonderful,Ica,Ica,Mercado Mayorista de Frutas,Lima,3.52,,4.0,23840.43,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-05-08,Granada,Wonderful,Ica,Ica,Mercado Mayorista de Frutas,Lima,4.28,,4.75,23228.31,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-11-15,Granada,Wonderful,Ica,Ica,Mercado Mayorista de Frutas,Lima,3.85,,4.37,16267.98,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2025-03-03,Granada,Wonderful,Ica,Ica,Mercado Mayorista de Frutas,Lima,4.06,,4.79,20732.37,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2025-03-16,Granada,Wonderful,Ica,Ica,,Lima,3.95,4.23,4.51,23577.99,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2025-04-29,Granada,Wonderful,Ica,Ica,,Lima,4.67,4.97,5.23,19259.03,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-04-26,Granada,Wonderful,Ica,Ica,Mercado Mayorista de Frutas,Lima,4.75,,5.49,20475.77,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2025-03-21,Papa,Yungay,Junin,Huancayo,,Lima,2.29,2.46,2.6,50288.3,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2025-03-28,Papa,Yungay,Junin,Huancayo,,Lima,2.79,2.99,3.27,42888.63,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2025-11-11,Papa,Yungay,Junin,Huancayo,,Lima,1.7,1.85,2.0,53560.75,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-01-12,Papa,Yungay,Junin,Huancayo,,Lima,1.76,1.93,2.05,50800.74,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-01-14,Papa,Yungay,Junin,Huancayo,,Lima,1.5,1.58,1.68,59020.37,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-01-09,Palta,Hass,La Libertad,Viru,,Lima,4.76,5.2,5.6,23660.38,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-02-12,Palta,Hass,La Libertad,Viru,,Lima,5.04,5.42,5.9,26053.52,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-10-29,Palta,Hass,La Libertad,Viru,Mercado Mayorista de Frutas,Lima,4.92,,5.68,19266.65,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-11-13,Palta,Hass,La Libertad,Viru,,Lima,4.52,4.84,5.13,24662.1,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-02-08,Palta,Hass,La Libertad,Viru,Mercado Mayorista de Frutas,Lima,5.58,,6.51,24343.72,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-03-06,Palta,Hass,La Libertad,Viru,Mercado Mayorista de Frutas,Lima,6.15,,6.98,21920.65,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-04-23,Palta,Hass,La Libertad,Viru,,Lima,6.59,7.23,7.7,25734.69,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-04-27,Palta,Hass,La Libertad,Viru,,Lima,6.25,6.81,7.48,27077.38,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-08-27,Quinua,Blanca De Junin,Puno,Puno,Gran Mercado Mayorista De Lima,Lima,4.58,,5.27,6789.78,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-12-25,Quinua,Blanca De Junin,Puno,Puno,Gran Mercado Mayorista De Lima,Lima,4.04,,4.65,7709.94,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-01-20,Quinua,Blanca De Junin,Puno,Puno,,Lima,3.85,4.12,4.42,8669.19,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-05-09,Quinua,Blanca De Junin,Puno,Puno,Gran Mercado Mayorista De Lima,Lima,4.59,,5.27,12245.83,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-01-15,Pimiento,Paprika,Arequipa,Arequipa,,Lima,2.18,2.36,2.53,19047.66,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-03-03,Pimiento,Paprika,Arequipa,Arequipa,Gran Mercado Mayorista De Lima,Lima,3.05,,3.39,16589.33,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-03-11,Pimiento,Paprika,Arequipa,Arequipa,,Lima,2.88,3.12,3.29,19364.62,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-03-12,Pimiento,Paprika,Arequipa,Arequipa,Gran Mercado Mayorista De Lima,Lima,3.07,,3.63,19017.42,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-04-13,Pimiento,Paprika,Arequipa,Arequipa,,Lima,4.29,4.55,4.8,13821.11,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2024-09-14,Pimiento,Paprika,Arequipa,Arequipa,,Lima,3.0,3.13,3.37,18245.73,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2025-07-27,Pimiento,Paprika,Arequipa,Arequipa,Gran Mercado Mayorista De Lima,Lima,4.76,,5.49,11042.32,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2025-12-23,Pimiento,Paprika,Arequipa,Arequipa,Gran Mercado Mayorista De Lima,Lima,3.74,,4.26,11531.24,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-03-31,Pimiento,Paprika,Arequipa,Arequipa,Gran Mercado Mayorista De Lima,Lima,3.92,,4.5,16016.74,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+market_prices,required_nulls,missing_required_market_field,2026-05-03,Pimiento,Paprika,Arequipa,Arequipa,Gran Mercado Mayorista De Lima,Lima,4.62,,5.41,13277.52,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,
+weather_daily,date_validation,invalid_date,2024-13-40,,,,,,,,,,,SYNTHETIC_GENERATOR,True,2026-06-30T00:00:00Z,Puno,Puno,Puno,-15.8402,-70.0219,5.92,20.79,13.05,5.26,59.25,15.97,
+market_prices,outlier_policy,extreme_outlier,2024-05-04,Granada,Wonderful,Ica,Ica,Mercado Mayorista de Frutas,Lima,8.64,9.37,10.13,19859.38,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2024-08-08,Granada,Wonderful,Ica,Ica,Mercado Mayorista de Frutas,Lima,9.27,9.71,10.28,15630.77,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2025-10-07,Granada,Wonderful,Ica,Ica,Mercado Mayorista de Frutas,Lima,8.19,8.97,9.8,17210.8,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2024-07-10,Palta,Hass,La Libertad,Viru,Mercado Mayorista de Frutas,Lima,2.15,2.27,2.47,29882.12,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2024-08-27,Palta,Hass,La Libertad,Viru,Mercado Mayorista de Frutas,Lima,1.91,2.03,2.16,26192.5,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2024-12-10,Palta,Hass,La Libertad,Viru,Mercado Mayorista de Frutas,Lima,1.58,1.73,1.82,24628.13,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2025-12-19,Palta,Hass,La Libertad,Viru,Mercado Mayorista de Frutas,Lima,1.78,1.87,1.96,19576.1,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2026-03-07,Palta,Hass,La Libertad,Viru,Mercado Mayorista de Frutas,Lima,2.05,2.24,2.39,22655.43,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2026-06-20,Palta,Hass,La Libertad,Viru,Mercado Mayorista de Frutas,Lima,12.33,13.28,14.02,30335.37,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2024-07-26,Quinua,Blanca De Junin,Puno,Puno,Gran Mercado Mayorista De Lima,Lima,9.39,10.01,10.66,6670.84,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2024-07-27,Quinua,Blanca De Junin,Puno,Puno,Gran Mercado Mayorista De Lima,Lima,9.06,9.63,10.56,6806.29,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2024-11-25,Quinua,Blanca De Junin,Puno,Puno,Gran Mercado Mayorista De Lima,Lima,1.36,1.42,1.52,7862.95,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2025-08-03,Quinua,Blanca De Junin,Puno,Puno,Gran Mercado Mayorista De Lima,Lima,1.62,1.76,1.92,8642.93,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2025-12-25,Quinua,Blanca De Junin,Puno,Puno,Gran Mercado Mayorista De Lima,Lima,1.41,1.48,1.56,7147.54,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True
+market_prices,outlier_policy,extreme_outlier,2026-01-12,Quinua,Blanca De Junin,Puno,Puno,Gran Mercado Mayorista De Lima,Lima,1.23,1.32,1.43,10220.47,SYNTHETIC_GENERATOR,True,2026-06-30,,,,,,,,,,,,True

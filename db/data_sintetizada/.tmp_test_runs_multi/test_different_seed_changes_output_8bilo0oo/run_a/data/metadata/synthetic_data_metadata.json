@@ -1,0 +1,140 @@
+{
+  "datasetType": "synthetic",
+  "officialData": false,
+  "randomSeed": 42,
+  "startDate": "2024-01-01",
+  "endDate": "2026-06-30",
+  "productCount": 5,
+  "products": [
+    {
+      "productId": 1,
+      "product": "Granada",
+      "variety": "Wonderful",
+      "origin": {
+        "department": "Ica",
+        "province": "Ica"
+      },
+      "destination": {
+        "market": "Mercado Mayorista de Frutas",
+        "city": "Lima"
+      }
+    },
+    {
+      "productId": 2,
+      "product": "Papa",
+      "variety": "Yungay",
+      "origin": {
+        "department": "Junin",
+        "province": "Huancayo"
+      },
+      "destination": {
+        "market": "Gran Mercado Mayorista de Lima",
+        "city": "Lima"
+      }
+    },
+    {
+      "productId": 3,
+      "product": "Palta",
+      "variety": "Hass",
+      "origin": {
+        "department": "La Libertad",
+        "province": "Viru"
+      },
+      "destination": {
+        "market": "Mercado Mayorista de Frutas",
+        "city": "Lima"
+      }
+    },
+    {
+      "productId": 4,
+      "product": "Quinua",
+      "variety": "Blanca de Junin",
+      "origin": {
+        "department": "Puno",
+        "province": "Puno"
+      },
+      "destination": {
+        "market": "Gran Mercado Mayorista de Lima",
+        "city": "Lima"
+      }
+    },
+    {
+      "productId": 5,
+      "product": "Pimiento",
+      "variety": "Paprika",
+      "origin": {
+        "department": "Arequipa",
+        "province": "Arequipa"
+      },
+      "destination": {
+        "market": "Gran Mercado Mayorista de Lima",
+        "city": "Lima"
+      }
+    }
+  ],
+  "currency": "PEN",
+  "standardUnit": "kg",
+  "generatorVersion": "1.1.0",
+  "generatedAt": "2026-07-18T19:24:21Z",
+  "disclaimer": "Dataset sintetico creado unicamente para desarrollo, pruebas y demostracion. No representa precios agricolas reales.",
+  "recordCounts": {
+    "synthetic_clean": {
+      "products.csv": 5,
+      "weather_daily.csv": 4560,
+      "crop_production_monthly.csv": 150,
+      "logistics_costs.csv": 150,
+      "market_prices.csv": 4560
+    },
+    "raw": {
+      "products.csv": 5,
+      "weather_daily.csv": 4592,
+      "crop_production_monthly.csv": 151,
+      "logistics_costs.csv": 151,
+      "market_prices.csv": 4592
+    }
+  },
+  "rawErrorRates": {
+    "products": {
+      "rows_before": 5,
+      "nulls": 1,
+      "unit_inconsistencies": 1,
+      "rows_after": 5
+    },
+    "weather_daily": {
+      "rows_before": 4560,
+      "nulls": 68,
+      "invalid_dates": 1,
+      "duplicates": 32,
+      "rows_after": 4592
+    },
+    "crop_production_monthly": {
+      "rows_before": 150,
+      "nulls": 2,
+      "duplicates": 1,
+      "rows_after": 151
+    },
+    "logistics_costs": {
+      "rows_before": 150,
+      "nulls": 2,
+      "duplicates": 1,
+      "unit_inconsistencies": 0,
+      "rows_after": 151
+    },
+    "market_prices": {
+      "rows_before": 4560,
+      "nulls": 68,
+      "name_variations": 46,
+      "price_outliers": 23,
+      "invalid_dates": 2,
+      "duplicates": 32,
+      "rows_after": 4592
+    }
+  },
+  "parameters": {
+    "seed": 42,
+    "start_date": "2024-01-01",
+    "end_date": "2026-06-30",
+    "overwrite": true,
+    "config_path": "D:\\Dalinn\\Hackaton\\config\\products.json"
+  }
+}

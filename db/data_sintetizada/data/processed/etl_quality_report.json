@@ -1,0 +1,112 @@
+{
+  "executionId": "86a99d5e-b1a5-47a1-b327-00d8b214cf48",
+  "startedAt": "2026-07-18T19:56:37Z",
+  "finishedAt": "2026-07-18T19:56:39Z",
+  "status": "SUCCESS",
+  "inputFiles": {
+    "products": "data\\raw\\products.csv",
+    "market_prices": "data\\raw\\market_prices.csv",
+    "weather_daily": "data\\raw\\weather_daily.csv",
+    "crop_production_monthly": "data\\raw\\crop_production_monthly.csv",
+    "logistics_costs": "data\\raw\\logistics_costs.csv"
+  },
+  "rowsRead": {
+    "products": 5,
+    "market_prices": 4592,
+    "weather_daily": 4592,
+    "crop_production_monthly": 151,
+    "logistics_costs": 151
+  },
+  "duplicatesRemoved": {
+    "products": 0,
+    "market_prices": 32,
+    "weather_daily": 32,
+    "crop_production_monthly": 1,
+    "logistics_costs": 1
+  },
+  "invalidRows": {
+    "products": 0,
+    "market_prices": 36,
+    "weather_daily": 1,
+    "crop_production_monthly": 0,
+    "logistics_costs": 0
+  },
+  "nullValuesBefore": {
+    "products": {
+      "currency": 1
+    },
+    "market_prices": {
+      "market": 17,
+      "market_city": 17,
+      "avg_price_per_kg": 17,
+      "volume_kg": 18
+    },
+    "weather_daily": {
+      "precipitation_mm": 22,
+      "humidity_avg": 23,
+      "wind_speed_kmh": 24
+    },
+    "crop_production_monthly": {
+      "production_tons": 1,
+      "yield_tons_per_ha": 1
+    },
+    "logistics_costs": {
+      "cost_per_kg": 1,
+      "fuel_price_index": 1
+    }
+  },
+  "nullValuesAfter": {
+    "products": {
+      "currency": 1
+    },
+    "market_prices": {
+      "market_city": 17
+    },
+    "weather_daily": {},
+    "crop_production_monthly": {},
+    "logistics_costs": {}
+  },
+  "outliersDetected": {
+    "market_prices": 32,
+    "crop_production_monthly": 0,
+    "logistics_costs": 0
+  },
+  "outliersRemoved": {
+    "market_prices": 15,
+    "crop_production_monthly": 0,
+    "logistics_costs": 0
+  },
+  "imputedValues": {
+    "products": 0,
+    "market_prices": 17,
+    "weather_daily": 68,
+    "crop_production_monthly": 2,
+    "logistics_costs": 2
+  },
+  "rowsMerged": 4509,
+  "trainingRows": 4263,
+  "inferenceRows": 4509,
+  "productSummary": {
+    "Granada": {
+      "rows": 910,
+      "training_rows": 904
+    },
+    "Palta": {
+      "rows": 895,
+      "training_rows": 892
+    },
+    "Papa": {
+      "rows": 907,
+      "training_rows": 903
+    },
+    "Pimiento": {
+      "rows": 900,
+      "training_rows": 898
+    },
+    "Quinua": {
+      "rows": 897,
+      "training_rows": 895
+    }
+  },
+  "notes": []
+}

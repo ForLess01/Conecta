@@ -1,0 +1,38 @@
+﻿{
+  "products": {
+    "granada": "Granada",
+    "granada wonderful": "Granada",
+    "papa": "Papa",
+    "palta": "Palta",
+    "palta hass": "Palta",
+    "quinua": "Quinua",
+    "pimiento": "Pimiento"
+  },
+  "varieties": {
+    "wonderful": "Wonderful",
+    "yungay": "Yungay",
+    "hass": "Hass",
+    "blanca de junin": "Blanca De Junin",
+    "paprika": "Paprika"
+  },
+  "markets": {
+    "mercado mayorista de frutas": "Mercado Mayorista de Frutas",
+    "m. mayorista de frutas": "Mercado Mayorista de Frutas",
+    "gran mercado mayorista de lima": "Gran Mercado Mayorista De Lima",
+    "gmm lima": "Gran Mercado Mayorista De Lima"
+  },
+  "departments": {
+    "ica": "Ica",
+    "junin": "Junin",
+    "la libertad": "La Libertad",
+    "puno": "Puno",
+    "arequipa": "Arequipa"
+  },
+  "provinces": {
+    "ica": "Ica",
+    "huancayo": "Huancayo",
+    "viru": "Viru",
+    "puno": "Puno",
+    "arequipa": "Arequipa"
+  }
+}
