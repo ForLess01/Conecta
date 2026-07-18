@@ -235,3 +235,51 @@ flowchart LR
 ```
 
 Ver el detalle exhaustivo de pantallas en `docs/DIAGRAMA_PANTALLAS.md`.
+
+---
+
+## 6. Estados y reglas de Publicación
+
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT
+    DRAFT --> ACTIVE: se publica (campos obligatorios completos)
+    ACTIVE --> PAUSED: el dueño pausa
+    PAUSED --> ACTIVE: el dueño reactiva
+    ACTIVE --> SOLD_OUT: cantidad disponible llega a 0
+    SOLD_OUT --> ACTIVE: el dueño repone cantidad
+    ACTIVE --> CLOSED: el dueño cierra (terminal)
+    PAUSED --> CLOSED: el dueño cierra (terminal)
+    SOLD_OUT --> CLOSED: el dueño cierra (terminal)
+    CLOSED --> [*]
+```
+
+- Solo el dueño de la publicación (o admin) puede pausar/reactivar/cerrar.
+- Solo se listan en el marketplace público las publicaciones `ACTIVE`. `PAUSED`, `SOLD_OUT` y `CLOSED` quedan visibles únicamente en "mis publicaciones" del dueño y en negociaciones/órdenes que ya las referencian.
+- Precio y cantidad son editables en `ACTIVE` y `PAUSED`, nunca en `SOLD_OUT` ni `CLOSED`.
+- Cerrar (`CLOSED`) es terminal y cancela automáticamente negociaciones abiertas sin acuerdo; no afecta órdenes ya creadas.
+- `CLOSED` no vuelve a abrirse — si se quiere retomar, se crea una publicación nueva.
+
+---
+
+## 7. Estados y reglas de Negociación conversacional
+
+```mermaid
+stateDiagram-v2
+    [*] --> OPEN: comprador inicia conversación
+    OPEN --> COUNTERED: se envía una propuesta
+    COUNTERED --> COUNTERED: contraoferta (reinicia vigencia)
+    COUNTERED --> ACCEPTED: alguna parte acepta la tarjeta activa
+    COUNTERED --> REJECTED: alguna parte rechaza
+    COUNTERED --> EXPIRED: vence la ventana sin respuesta
+    OPEN --> CANCELLED: cualquier parte cierra sin propuesta
+    ACCEPTED --> [*]: se crea la orden
+    REJECTED --> [*]
+    EXPIRED --> [*]
+    CANCELLED --> [*]
+```
+
+- La ventana (12/24/48/72h) se reinicia con cada contraoferta.
+- Al vencer sin respuesta (`EXPIRED`), la conversación queda de solo lectura; para retomar hay que iniciar una nueva.
+- `ACCEPTED` es terminal e inmediato: dispara la creación de orden y bloquea nuevas tarjetas sobre esa conversación.
+- Solo puede haber una conversación con tarjeta activa por comprador-publicación a la vez.
