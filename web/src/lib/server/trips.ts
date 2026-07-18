@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getMyActorContext } from "@/lib/supabase/session";
 import type { Database } from "@/lib/supabase/types.gen";
 
-type OperationArgs = Database["public"]["Functions"]["record_trip_operation"]["Args"];
+type OperationArgs = Database["public"]["Functions"]["record_and_transition_trip_operation"]["Args"];
 type NullableOperationArgs = Omit<OperationArgs, "p_package_count" | "p_accepted_quantity" | "p_observed_quantity" | "p_condition_notes" | "p_notes"> & {
   p_package_count: number | null;
   p_accepted_quantity: number | null;
@@ -111,7 +111,7 @@ export async function recordTripOperation(input: z.input<typeof operationRecordS
     p_accepted_quantity: command.acceptedQuantity, p_observed_quantity: command.observedQuantity,
     p_condition_notes: command.conditionNotes || null, p_notes: command.notes || null, p_confirmed: true,
   } satisfies NullableOperationArgs;
-  const { data, error } = await supabase.rpc("record_trip_operation", args as OperationArgs);
+  const { data, error } = await supabase.rpc("record_and_transition_trip_operation", args as OperationArgs);
   if (error) throw new Error(`Could not record trip operation: ${error.message}`);
   return data as string;
 }

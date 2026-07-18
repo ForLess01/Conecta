@@ -30,10 +30,7 @@ export default async function PublishRequestPage() {
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="acceptsMultiple" defaultChecked /> Aceptar múltiples productores</label>
           </div>
         </CardContent></Card>
-        <div className="flex justify-end gap-2">
-          <Button type="submit" name="intent" value="draft" variant="outline">Guardar borrador</Button>
-          <Button type="submit" name="intent" value="publish">Publicar</Button>
-        </div>
+        <div className="flex justify-end gap-2"><Button type="submit" name="intent" value="draft" variant="outline">Guardar borrador</Button><Button type="submit" name="intent" value="publish">Publicar</Button></div>
       </form>
     </div>
   );

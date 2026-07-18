@@ -4024,6 +4024,21 @@ export type Database = {
         Args: { p_actor_id: string; p_shipment_id: string }
         Returns: string
       }
+      record_and_transition_trip_operation: {
+        Args: {
+          p_accepted_quantity: number
+          p_actor_id: string
+          p_condition_notes: string
+          p_confirmed: boolean
+          p_notes: string
+          p_observed_quantity: number
+          p_package_count: number
+          p_record_type: string
+          p_trip_id: string
+          p_weight_kg: number
+        }
+        Returns: string
+      }
       record_trip_operation: {
         Args: {
           p_accepted_quantity: number

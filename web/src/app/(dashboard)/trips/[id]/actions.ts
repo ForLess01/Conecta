@@ -28,7 +28,6 @@ export async function pickupAction(formData: FormData) {
     notes: String(formData.get("notes") ?? ""), confirmed,
   });
   await saveEvidence(formData, tripId, "PICKUP_PHOTO");
-  await transitionTrip({ tripId, status: "PICKED_UP", notes: "Recojo confirmado" });
   revalidatePath(`/trips/${tripId}`);
   redirect(`/trips/${tripId}`);
 }
@@ -43,7 +42,6 @@ export async function deliveryAction(formData: FormData) {
     conditionNotes: String(formData.get("conditionNotes") ?? ""), notes: String(formData.get("notes") ?? ""), confirmed,
   });
   await saveEvidence(formData, tripId, "DELIVERY_PHOTO");
-  await transitionTrip({ tripId, status: "DELIVERED", notes: "Entrega confirmada" });
   revalidatePath(`/trips/${tripId}`);
   redirect(`/trips/${tripId}`);
 }

@@ -1,0 +1,22 @@
+{
+  "Granada|Wonderful": {
+    "strategy": "global",
+    "model": "LinearRegression"
+  },
+  "Palta|Hass": {
+    "strategy": "individual",
+    "model": "LinearRegression"
+  },
+  "Papa|Yungay": {
+    "strategy": "individual",
+    "model": "RandomForestRegressor"
+  },
+  "Pimiento|Paprika": {
+    "strategy": "individual",
+    "model": "LinearRegression"
+  },
+  "Quinua|Blanca De Junin": {
+    "strategy": "global",
+    "model": "LinearRegression"
+  }
+}

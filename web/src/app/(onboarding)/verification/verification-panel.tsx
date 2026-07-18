@@ -61,10 +61,10 @@ export function VerificationPanel({ verification }: { verification: Verification
       <Card><CardHeader><CardTitle className="font-heading text-base">Solicitud de verificación</CardTitle></CardHeader><CardContent className="space-y-3">
         <div className="flex items-center justify-between rounded-xl border border-border px-3 py-2.5"><span className="flex items-center gap-2 text-sm font-medium"><FileText className="size-4 text-muted-foreground" /> Verificación de identidad</span>{badge ? <Badge variant={badge.variant}>{badge.label}</Badge> : <Badge variant="secondary">Sin solicitar</Badge>}</div>
         {verification.reviewerNotes && <p className="rounded-xl bg-muted/60 p-3 text-sm text-muted-foreground">{verification.reviewerNotes}</p>}
-        <Button className="w-full gap-2" disabled={isPending || requestStatus === "PENDING" || verified} onClick={submit}><Send className="size-4" />{isPending ? "Enviando..." : requestStatus === "PENDING" ? "Solicitud en revisión" : verified ? "Perfil verificado" : "Enviar solicitud"}</Button>
+        <Button className="w-full gap-2" disabled={!verification.profileComplete || isPending || requestStatus === "PENDING" || verified} onClick={submit}><Send className="size-4" />{!verification.profileComplete ? "Completa tus perfiles operativos" : isPending ? "Enviando..." : requestStatus === "PENDING" ? "Solicitud en revisión" : verified ? "Perfil verificado" : "Enviar solicitud"}</Button>
       </CardContent></Card>
       <Card><CardHeader><CardTitle className="font-heading text-base">Niveles de verificación</CardTitle></CardHeader><CardContent className="space-y-2">{LEVELS.map((level, index) => <div key={level.name} className="flex items-start gap-3 rounded-xl bg-muted/60 p-3"><BadgeCheck className={index === 0 || verified && index === 1 ? "size-5 text-primary" : "size-5 text-muted-foreground"} /><div><p className="text-sm font-medium">{level.name}</p><p className="text-xs text-muted-foreground">{level.detail}</p></div></div>)}</CardContent></Card>
-      <div className="flex flex-wrap justify-end gap-2"><Button variant="outline" asChild><Link href="/settings">Completar perfil</Link></Button><Button asChild><Link href="/home">Ir al inicio</Link></Button></div>
+      <div className="flex flex-wrap justify-end gap-2"><Button variant="outline" asChild><Link href="/role-selection">Completar perfiles</Link></Button><Button asChild><Link href="/home">Ir al inicio</Link></Button></div>
     </div>
   );
 }

@@ -20,6 +20,12 @@ let userId;
 let actorId;
 let negotiationId;
 let quickNegotiationId;
+let producerUserId;
+let producerActorId;
+let requestListingId;
+let requestLocationId;
+let requestNegotiationId;
+let requestOrderId;
 
 try {
   const { data: created, error: createError } = await admin.auth.admin.createUser({
@@ -101,6 +107,85 @@ try {
   });
   if (dashboardError || !dashboard) throw dashboardError ?? new Error("Dashboard was not returned.");
 
+  const producerEmail = `smoke-producer-${Date.now()}@conecta.test`;
+  const producerPassword = `Smoke-${crypto.randomUUID()}!`;
+  const { data: createdProducer, error: producerCreateError } = await admin.auth.admin.createUser({
+    email: producerEmail,
+    password: producerPassword,
+    email_confirm: true,
+    user_metadata: { full_name: "Conecta Producer Smoke" },
+  });
+  if (producerCreateError) throw producerCreateError;
+  producerUserId = createdProducer.user.id;
+  const producerClient = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
+  const { error: producerLoginError } = await producerClient.auth.signInWithPassword({
+    email: producerEmail,
+    password: producerPassword,
+  });
+  if (producerLoginError) throw producerLoginError;
+  const { data: producerActor, error: producerBootstrapError } = await producerClient.rpc("bootstrap_actor", {
+    p_profile_kind: "person",
+    p_role_codes: ["productor"],
+    p_display_name: "Conecta Producer Smoke",
+  });
+  if (producerBootstrapError) throw producerBootstrapError;
+  producerActorId = producerActor;
+
+  const [{ data: product }, { data: unit }] = await Promise.all([
+    admin.from("products").select("id").ilike("code", "POTATO").single(),
+    admin.from("units_of_measure").select("id").ilike("code", "KG").single(),
+  ]);
+  if (!product || !unit) throw new Error("Product catalogs are incomplete.");
+  const { data: requestId, error: requestError } = await userClient.rpc("create_purchase_request", {
+    p_actor_id: actorId,
+    p_product_id: product.id,
+    p_variety_id: null,
+    p_title: "Smoke test potato request",
+    p_description: "Temporary request used by the integration smoke test.",
+    p_quantity: 100,
+    p_unit_id: unit.id,
+    p_location_label: "Smoke destination",
+    p_latitude: -15.84,
+    p_longitude: -70.02,
+    p_deadline_at: new Date(Date.now() + 86_400_000).toISOString(),
+    p_delivery_deadline: new Date(Date.now() + 172_800_000).toISOString().slice(0, 10),
+    p_accepts_partial_offers: true,
+    p_accepts_multiple_suppliers: true,
+    p_publish: true,
+  });
+  if (requestError) throw requestError;
+  requestListingId = requestId;
+  const { data: requestRow } = await admin.from("market_listings").select("location_point_id").eq("id", requestListingId).single();
+  requestLocationId = requestRow?.location_point_id;
+
+  const { data: requestConversation, error: requestConversationError } = await producerClient.rpc(
+    "commerce_create_conversation",
+    { p_listing_id: requestListingId, p_actor_id: producerActorId },
+  );
+  if (requestConversationError) throw requestConversationError;
+  requestNegotiationId = requestConversation?.[0]?.negotiation_id;
+  if (!requestNegotiationId) throw new Error("Request conversation was not created.");
+  const { data: proposal, error: proposalError } = await producerClient.rpc("commerce_create_proposal", {
+    p_negotiation_id: requestNegotiationId,
+    p_actor_id: producerActorId,
+    p_quantity: 100,
+    p_unit_price: 2.2,
+    p_currency_code: "PEN",
+    p_logistics_mode: "BUYER_PICKUP",
+  });
+  if (proposalError) throw proposalError;
+  const proposalId = proposal?.id;
+  if (!proposalId) throw new Error("Request proposal was not created.");
+  const { data: accepted, error: acceptanceError } = await userClient.rpc("commerce_respond_to_proposal", {
+    p_negotiation_id: requestNegotiationId,
+    p_proposal_id: proposalId,
+    p_actor_id: actorId,
+    p_accept: true,
+  });
+  if (acceptanceError) throw acceptanceError;
+  requestOrderId = accepted?.[0]?.order_id;
+  if (!requestOrderId) throw new Error("Request proposal did not create an order.");
+
   console.log(JSON.stringify({
     authenticated: true,
     actorBootstrapped: true,
@@ -110,8 +195,36 @@ try {
     quickOfferProtected: true,
     adminAuthorization: true,
     dashboardLoaded: true,
+    requestProposalAccepted: true,
   }));
 } finally {
+  if (requestOrderId) {
+    const { data: items } = await admin.from("order_items").select("id").eq("order_id", requestOrderId);
+    const itemIds = (items ?? []).map((item) => item.id);
+    if (itemIds.length) await admin.from("order_supplier_allocations").delete().in("order_item_id", itemIds);
+    await admin.from("order_items").delete().eq("order_id", requestOrderId);
+    await admin.from("order_negotiations").delete().eq("order_id", requestOrderId);
+    await admin.from("commercial_orders").delete().eq("id", requestOrderId);
+  }
+  if (requestNegotiationId) {
+    await admin.from("commercial_proposals").delete().eq("negotiation_id", requestNegotiationId);
+    await admin.from("messages").delete().eq("negotiation_id", requestNegotiationId);
+    await admin.from("negotiation_participants").delete().eq("negotiation_id", requestNegotiationId);
+    await admin.from("negotiations").delete().eq("id", requestNegotiationId);
+  }
+  if (requestListingId) {
+    await admin.from("purchase_requests").delete().eq("listing_id", requestListingId);
+    await admin.from("market_listings").delete().eq("id", requestListingId);
+  }
+  if (requestLocationId) await admin.from("location_points").delete().eq("id", requestLocationId);
+  if (producerActorId) {
+    await admin.from("actor_roles").delete().eq("actor_id", producerActorId);
+    await admin.from("actors").delete().eq("id", producerActorId);
+  }
+  if (producerUserId) {
+    await admin.from("user_roles").delete().eq("user_id", producerUserId);
+    await admin.auth.admin.deleteUser(producerUserId);
+  }
   if (actorId) {
     await admin.from("quick_offer_attempts").delete().eq("buyer_actor_id", actorId);
   }

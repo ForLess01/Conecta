@@ -42,7 +42,14 @@ Contraseña demo compartida: `Demo2026!` (solo para el entorno de demo, nunca en
 
 ---
 
-## 4. Cobertura de aceptación (S0-11)
+## 4. Seed reproducible (S1-14)
+
+Locations, demo users/actors and vehicles from this plan are seeded by
+`web/supabase/seed.sql` (idempotent, fixed UUIDs). The product catalog is
+already seeded by `db/db_conecta.sql`. Loading the two demo scenarios
+(market listings) is S4-03.
+
+## 5. Cobertura de aceptación (S0-11)
 
 - [x] 3 productores.
 - [x] 2 compradores.

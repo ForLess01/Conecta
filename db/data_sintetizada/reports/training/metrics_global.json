@@ -1,0 +1,17 @@
+{
+  "model_name": "LinearRegression",
+  "validation_MAE": 0.14265347464470873,
+  "validation_RMSE": 0.18564329643222327,
+  "validation_MAPE": 4.023981094216931,
+  "validation_R2": 0.9792811246226993,
+  "validation_MedianAbsoluteError": 0.11443382314434469,
+  "validation_DirectionalAccuracy": 0.684375,
+  "test_MAE": 0.15625142535122952,
+  "test_RMSE": 0.20532048144087178,
+  "test_MAPE": 4.260541536466265,
+  "test_R2": 0.982534330901626,
+  "test_MedianAbsoluteError": 0.12778427715148044,
+  "test_DirectionalAccuracy": 0.765807962529274,
+  "selected_score": 0.14605296232133894,
+  "selection_reason": "Lowest selected score and better than rolling_mean_7 baseline."
+}

@@ -1,0 +1,6 @@
+product_id,product_name,variety,standard_unit,currency,is_synthetic
+1,Granada,Wonderful,kilogramo,PEN,True
+2,Papa,Yungay,kg,PEN,True
+3,Palta,Hass,kg,,True
+4,Quinua,Blanca de Junin,kg,PEN,True
+5,Pimiento,Paprika,kg,PEN,True

@@ -1,0 +1,142 @@
+{
+  "Granada|Wonderful": {
+    "global": {
+      "MAE": 0.13992909442441437,
+      "RMSE": 0.18675382891036582,
+      "MAPE": 2.8454913788692524,
+      "R2": 0.7977750991151767,
+      "MedianAbsoluteError": 0.11150255710072177,
+      "DirectionalAccuracy": 0.7017543859649122
+    },
+    "individual": {
+      "model_name": "LinearRegression",
+      "validation_MAE": 0.07723115237933076,
+      "validation_RMSE": 0.10040165521161992,
+      "validation_MAPE": 1.7022041801833858,
+      "validation_R2": 0.816298733745089,
+      "validation_MedianAbsoluteError": 0.056051304394332924,
+      "validation_DirectionalAccuracy": 0.7578125,
+      "test_MAE": 0.16213101685377684,
+      "test_RMSE": 0.20530547667964014,
+      "test_MAPE": 3.3166483181055884,
+      "test_R2": 0.755602549463448,
+      "test_MedianAbsoluteError": 0.149204596460919,
+      "test_DirectionalAccuracy": 0.6491228070175439,
+      "selected_score": 0.09845611849794228,
+      "selection_reason": "Lowest selected score and better than rolling_mean_7 baseline."
+    },
+    "selectedStrategy": "global"
+  },
+  "Palta|Hass": {
+    "global": {
+      "MAE": 0.16916055133616548,
+      "RMSE": 0.21034777925722306,
+      "MAPE": 2.5419370652585918,
+      "R2": 0.8225740655201794,
+      "MedianAbsoluteError": 0.13846968616588118,
+      "DirectionalAccuracy": 0.7251461988304093
+    },
+    "individual": {
+      "model_name": "LinearRegression",
+      "validation_MAE": 0.09654295518847161,
+      "validation_RMSE": 0.12900790734108417,
+      "validation_MAPE": 1.6379819882812316,
+      "validation_R2": 0.803532661579111,
+      "validation_MedianAbsoluteError": 0.07604817917229845,
+      "validation_DirectionalAccuracy": 0.6614173228346457,
+      "test_MAE": 0.1145084564935235,
+      "test_RMSE": 0.15894494820516575,
+      "test_MAPE": 1.7558783670197098,
+      "test_R2": 0.8986941098469395,
+      "test_MedianAbsoluteError": 0.07706084636557176,
+      "test_DirectionalAccuracy": 0.8128654970760234,
+      "selected_score": 0.10103433051473458,
+      "selection_reason": "Lowest selected score and better than rolling_mean_7 baseline."
+    },
+    "selectedStrategy": "individual"
+  },
+  "Papa|Yungay": {
+    "global": {
+      "MAE": 0.17802331656076797,
+      "RMSE": 0.23178767394085154,
+      "MAPE": 9.224158255229158,
+      "R2": 0.662916457061707,
+      "MedianAbsoluteError": 0.16322862244116754,
+      "DirectionalAccuracy": 0.872093023255814
+    },
+    "individual": {
+      "model_name": "RandomForestRegressor",
+      "validation_MAE": 0.11881624684594963,
+      "validation_RMSE": 0.1452594758958255,
+      "validation_MAPE": 5.67264348044973,
+      "validation_R2": 0.7161593901707284,
+      "validation_MedianAbsoluteError": 0.1054693661259396,
+      "validation_DirectionalAccuracy": 0.8217054263565892,
+      "test_MAE": 0.17053027148492947,
+      "test_RMSE": 0.21364194866475908,
+      "test_MAPE": 7.684461477712086,
+      "test_R2": 0.7136284061390715,
+      "test_MedianAbsoluteError": 0.1513506680518113,
+      "test_DirectionalAccuracy": 0.872093023255814,
+      "selected_score": 0.1317447530056946,
+      "selection_reason": "Lowest selected score and better than rolling_mean_7 baseline."
+    },
+    "selectedStrategy": "individual"
+  },
+  "Pimiento|Paprika": {
+    "global": {
+      "MAE": 0.15970991087926523,
+      "RMSE": 0.2092366284955322,
+      "MAPE": 3.8592856781489826,
+      "R2": 0.9437979910979348,
+      "MedianAbsoluteError": 0.13126394254810614,
+      "DirectionalAccuracy": 0.7732558139534884
+    },
+    "individual": {
+      "model_name": "LinearRegression",
+      "validation_MAE": 0.1856233735048809,
+      "validation_RMSE": 0.24273330966608714,
+      "validation_MAPE": 5.805837111062615,
+      "validation_R2": 0.5657270079470016,
+      "validation_MedianAbsoluteError": 0.14712545108214448,
+      "validation_DirectionalAccuracy": 0.7209302325581395,
+      "test_MAE": 0.15828677978076605,
+      "test_RMSE": 0.2050325605529878,
+      "test_MAPE": 3.9725960166782053,
+      "test_R2": 0.9460337695837242,
+      "test_MedianAbsoluteError": 0.1338402002932293,
+      "test_DirectionalAccuracy": 0.7790697674418605,
+      "selected_score": 0.1924575219359096,
+      "selection_reason": "Lowest selected score and better than rolling_mean_7 baseline."
+    },
+    "selectedStrategy": "individual"
+  },
+  "Quinua|Blanca De Junin": {
+    "global": {
+      "MAE": 0.1338944803881257,
+      "RMSE": 0.1842074795858628,
+      "MAPE": 2.7791657836624344,
+      "R2": 0.7596795187954166,
+      "MedianAbsoluteError": 0.10601563240502854,
+      "DirectionalAccuracy": 0.7559523809523809
+    },
+    "individual": {
+      "model_name": "XGBoostRegressor",
+      "validation_MAE": 0.09010729125701941,
+      "validation_RMSE": 0.11731907297602162,
+      "validation_MAPE": 2.10583181646446,
+      "validation_R2": 0.7420102716770796,
+      "validation_MedianAbsoluteError": 0.06517028536115399,
+      "validation_DirectionalAccuracy": 0.6614173228346457,
+      "test_MAE": 0.19143433737106066,
+      "test_RMSE": 0.23495679473655717,
+      "test_MAPE": 3.856342110176868,
+      "test_R2": 0.6090220347768462,
+      "test_MedianAbsoluteError": 0.1855235563005717,
+      "test_DirectionalAccuracy": 0.5773809523809523,
+      "selected_score": 0.11543905278552972,
+      "selection_reason": "Lowest selected score and better than rolling_mean_7 baseline."
+    },
+    "selectedStrategy": "global"
+  }
+}

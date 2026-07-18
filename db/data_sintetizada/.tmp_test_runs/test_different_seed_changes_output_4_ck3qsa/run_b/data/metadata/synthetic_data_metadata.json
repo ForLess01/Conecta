@@ -1,0 +1,75 @@
+{
+  "datasetType": "synthetic",
+  "officialData": false,
+  "randomSeed": 99,
+  "startDate": "2023-01-01",
+  "endDate": "2026-06-30",
+  "product": "Granada",
+  "variety": "Wonderful",
+  "origin": "Ica",
+  "destination": "Lima",
+  "currency": "PEN",
+  "standardUnit": "kg",
+  "generatorVersion": "1.0.0",
+  "generatedAt": "2026-07-18T18:24:30Z",
+  "disclaimer": "Dataset sintetico creado unicamente para desarrollo, pruebas y demostracion. No representa precios agricolas reales.",
+  "recordCounts": {
+    "synthetic_clean": {
+      "products.csv": 1,
+      "market_prices.csv": 1277,
+      "weather_daily.csv": 1277,
+      "crop_production_monthly.csv": 42,
+      "logistics_costs.csv": 42
+    },
+    "raw": {
+      "products.csv": 1,
+      "market_prices.csv": 1286,
+      "weather_daily.csv": 1286,
+      "crop_production_monthly.csv": 43,
+      "logistics_costs.csv": 43
+    }
+  },
+  "rawErrorRates": {
+    "products": {
+      "rows_before": 1,
+      "nulls": 1,
+      "unit_inconsistencies": 1,
+      "rows_after": 1
+    },
+    "market_prices": {
+      "rows_before": 1277,
+      "nulls": 19,
+      "name_variations": 13,
+      "price_outliers": 6,
+      "invalid_dates": 2,
+      "duplicates": 9,
+      "rows_after": 1286
+    },
+    "weather_daily": {
+      "rows_before": 1277,
+      "nulls": 19,
+      "invalid_dates": 1,
+      "duplicates": 9,
+      "rows_after": 1286
+    },
+    "crop_production_monthly": {
+      "rows_before": 42,
+      "nulls": 1,
+      "duplicates": 1,
+      "rows_after": 43
+    },
+    "logistics_costs": {
+      "rows_before": 42,
+      "nulls": 1,
+      "unit_inconsistencies": 0,
+      "duplicates": 1,
+      "rows_after": 43
+    }
+  },
+  "parameters": {
+    "seed": 99,
+    "start_date": "2023-01-01",
+    "end_date": "2026-06-30",
+    "overwrite": true
+  }
+}
