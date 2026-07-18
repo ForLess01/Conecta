@@ -9,6 +9,11 @@ import {
   type QuickOfferStatus,
 } from "@/lib/negotiation/quick-offer";
 import { getDemoPrivateFloorPrice } from "./demo-private-pricing";
+import { createOrderFromQuickOffer } from "../orders/order-service";
+
+// Demo-only compromise: no auth yet, so an unauthenticated quick offer is
+// attributed to a fixed demo buyer instead of a real actor id.
+const DEMO_BUYER_ACTOR_ID = "demo-buyer";
 
 export interface QuickOfferCommand {
   offerListingId: string;
@@ -152,13 +157,26 @@ const demoAdapter: QuickOfferAdapter = {
     }
 
     const now = Date.now();
+    const reservationExpiresAt = new Date(now + RESERVATION_MINUTES * 60_000).toISOString();
+
+    // S2-07: a quick offer creates the same order structure a conversational
+    // proposal accept does — only the `source` differs.
+    const order = await createOrderFromQuickOffer({
+      buyerActorId: command.buyerActorId ?? DEMO_BUYER_ACTOR_ID,
+      producerActorId: product.producerId,
+      offerListingId: command.offerListingId,
+      quantity: command.quantity,
+      unit: product.unit,
+      unitPrice: command.unitPrice,
+      reservationExpiresAt,
+    });
 
     return {
       accepted: true,
       status: "AUTO_ACCEPTED",
       attemptsRemaining,
-      reservationExpiresAt: new Date(now + RESERVATION_MINUTES * 60_000).toISOString(),
-      orderId: `demo-order-${randomUUID()}`,
+      reservationExpiresAt,
+      orderId: order.id,
       negotiationId: `demo-negotiation-${randomUUID()}`,
     };
   },
